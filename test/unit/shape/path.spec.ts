@@ -1,12 +1,10 @@
 const expect = require('chai').expect;
-const {
-  resolve
-} = require('path');
 const G = require('../../../src/index');
 const Canvas = require('../../../src/canvas');
 const div = document.createElement('div');
 div.id = 'canvas-path';
 document.body.appendChild(div);
+const baseHref = (document.getElementsByTagName('base')[ 0 ] || {}).href || './base';
 
 describe('Path', function() {
 
@@ -18,7 +16,7 @@ describe('Path', function() {
   });
 
   const img = document.createElement('img');
-  img.src = resolve(process.cwd(), './test/fixtures/test1.jpg');
+  img.src = baseHref + '/test/fixtures/test1.jpg';
   img.id = 'img';
   document.body.appendChild(img);
 
@@ -26,7 +24,9 @@ describe('Path', function() {
 
   it('init attrs', function() {
     expect(path.attr('path')).to.undefined;
-    expect(path.attr('lineWidth')).to.equal(1);
+    expect(path.attr('lineWidth'))
+      .to
+      .equal(1);
     expect(path.getBBox()).to.be.null;
     canvas.add(path);
     canvas.draw();
@@ -46,28 +46,52 @@ describe('Path', function() {
       [ 'L', 300, 300 ]
     ]);
 
-    expect(path.get('segments').length).to.equal(2);
+    expect(path.get('segments').length)
+      .to
+      .equal(2);
     const box = path.getBBox();
-    expect(box.minX).to.equal(199.5);
-    expect(box.maxX).to.equal(300.5);
-    expect(box.minY).to.equal(199.5);
-    expect(box.maxY).to.equal(300.5);
+    expect(box.minX)
+      .to
+      .equal(199.5);
+    expect(box.maxX)
+      .to
+      .equal(300.5);
+    expect(box.minY)
+      .to
+      .equal(199.5);
+    expect(box.maxY)
+      .to
+      .equal(300.5);
   });
 
   it('lineWidth', function() {
-    expect(path.attr('lineWidth')).to.equal(1);
+    expect(path.attr('lineWidth'))
+      .to
+      .equal(1);
     path.attr('lineWidth', 2);
-    expect(path.attr('lineWidth')).to.equal(2);
+    expect(path.attr('lineWidth'))
+      .to
+      .equal(2);
     const box = path.getBBox();
-    expect(box.minX).to.equal(199);
-    expect(box.maxX).to.equal(301);
-    expect(box.minY).to.equal(199);
-    expect(box.maxY).to.equal(301);
+    expect(box.minX)
+      .to
+      .equal(199);
+    expect(box.maxX)
+      .to
+      .equal(301);
+    expect(box.minY)
+      .to
+      .equal(199);
+    expect(box.maxY)
+      .to
+      .equal(301);
   });
 
   it('stroke', function() {
     path.attr('stroke', 'l (0) 0:#fff000 1:#000fff');
-    expect(path.attr('stroke')).to.equal('l (0) 0:#fff000 1:#000fff');
+    expect(path.attr('stroke'))
+      .to
+      .equal('l (0) 0:#fff000 1:#000fff');
     canvas.add(path);
     canvas.draw();
   });
@@ -80,8 +104,12 @@ describe('Path', function() {
       arrowLength: 30
     });
     expect(path.attr('endArrow')).to.true;
-    expect(path.attr('arrowAngle')).to.equal(90);
-    expect(path.attr('arrowLength')).to.equal(30);
+    expect(path.attr('arrowAngle'))
+      .to
+      .equal(90);
+    expect(path.attr('arrowLength'))
+      .to
+      .equal(30);
 
     canvas.add(path);
     canvas.draw();
@@ -99,7 +127,9 @@ describe('Path', function() {
         fill: 'red'
       }
     });
-    expect(path.attr('fill')).to.equal('red');
+    expect(path.attr('fill'))
+      .to
+      .equal('red');
     canvas.add(path);
     canvas.draw();
   });
@@ -108,17 +138,17 @@ describe('Path', function() {
     const path = new G.Path({
       attrs: {
         path: 'M100,600' +
-              'l 50,-25' +
-              'a25,25 -30 0,1 50,-25' +
-              'l 50,-25' +
-              'a25,50 -30 0,1 50,-25' +
-              'l 50,-25' +
-              'a25,75 -30 0,1 50,-25' +
-              'l 50,-25' +
-              'a25,100 -30 0,1 50,-25' +
-              'l 50,-25' +
-              'l 0, 200,' +
-              'z',
+        'l 50,-25' +
+        'a25,25 -30 0,1 50,-25' +
+        'l 50,-25' +
+        'a25,50 -30 0,1 50,-25' +
+        'l 50,-25' +
+        'a25,75 -30 0,1 50,-25' +
+        'l 50,-25' +
+        'a25,100 -30 0,1 50,-25' +
+        'l 50,-25' +
+        'l 0, 200,' +
+        'z',
         lineWidth: 10,
         lineJoin: 'round',
         stroke: 'red'
@@ -415,10 +445,18 @@ describe('Path', function() {
     const point3 = path7.getPoint(0.225);
     canvas.add(path7);
     canvas.draw();
-    expect(point0).to.eql({ x: 300, y: 300 });
-    expect(point1).to.eql({ x: 174.99999999999997, y: 50 });
-    expect(point2).to.eql({ x: 50, y: 300 });
-    expect(point3).to.eql({ x: 300, y: 112.0546875 });
+    expect(point0)
+      .to
+      .eql({ x: 300, y: 300 });
+    expect(point1)
+      .to
+      .eql({ x: 174.99999999999997, y: 50 });
+    expect(point2)
+      .to
+      .eql({ x: 50, y: 300 });
+    expect(point3)
+      .to
+      .eql({ x: 300, y: 112.0546875 });
   });
 
   it('appendWidth', function() {

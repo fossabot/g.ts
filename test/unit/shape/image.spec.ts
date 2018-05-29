@@ -1,12 +1,11 @@
 const expect = require('chai').expect;
-const {
-  resolve
-} = require('path');
+
 const G = require('../../../src/index');
 const Canvas = require('../../../src/canvas');
 const div = document.createElement('div');
 div.id = 'canvas-img';
 document.body.appendChild(div);
+const baseHref = (document.getElementsByTagName('base')[ 0 ] || {}).href || './base';
 
 describe('Image', function() {
 
@@ -30,20 +29,36 @@ describe('Image', function() {
     }
   });
   it('init attr', function() {
-    expect(image.attr('x')).to.equal(0);
-    expect(image.attr('y')).to.equal(0);
+    expect(image.attr('x'))
+      .to
+      .equal(0);
+    expect(image.attr('y'))
+      .to
+      .equal(0);
     expect(image.attr('img')).to.be.undefined;
-    expect(image.attr('width')).to.equal(0);
-    expect(image.attr('height')).to.equal(0);
+    expect(image.attr('width'))
+      .to
+      .equal(0);
+    expect(image.attr('height'))
+      .to
+      .equal(0);
     expect(image.attr('sx')).to.be.undefined;
     expect(image.attr('sy')).to.be.undefined;
     expect(image.attr('swidth')).to.be.undefined;
     expect(image.attr('sheight')).to.be.undefined;
     const box = image.getBBox();
-    expect(box.minX).to.equal(0);
-    expect(box.maxX).to.equal(0);
-    expect(box.minY).to.equal(0);
-    expect(box.maxY).to.equal(0);
+    expect(box.minX)
+      .to
+      .equal(0);
+    expect(box.maxX)
+      .to
+      .equal(0);
+    expect(box.minY)
+      .to
+      .equal(0);
+    expect(box.maxY)
+      .to
+      .equal(0);
   });
 
   it('img', function(done) {
@@ -51,15 +66,23 @@ describe('Image', function() {
     img.onload = function() {
       image.attr('img', img);
       const box = image.getBBox();
-      expect(box.minX).to.equal(0);
-      expect(box.minY).to.equal(0);
-      expect(box.maxX).to.equal(768);
-      expect(box.maxY).to.equal(1024);
+      expect(box.minX)
+        .to
+        .equal(0);
+      expect(box.minY)
+        .to
+        .equal(0);
+      expect(box.maxX)
+        .to
+        .equal(768);
+      expect(box.maxY)
+        .to
+        .equal(1024);
       canvas.add(image);
       canvas.draw();
       done();
     };
-    img.src = resolve(process.cwd(), './test/fixtures/test1.jpg'); // relative to test/unit
+    img.src = (baseHref + '/test/fixtures/test1.jpg'); // relative to test/unit
   });
 
   it('canvas', function() {
@@ -72,10 +95,18 @@ describe('Image', function() {
     const img = can1;
     image.attr('img', img);
     const box = image.getBBox();
-    expect(box.minX).to.equal(0);
-    expect(box.minY).to.equal(0);
-    expect(box.maxX).to.equal(800);
-    expect(box.maxY).to.equal(800);
+    expect(box.minX)
+      .to
+      .equal(0);
+    expect(box.minY)
+      .to
+      .equal(0);
+    expect(box.maxX)
+      .to
+      .equal(800);
+    expect(box.maxY)
+      .to
+      .equal(800);
     canvas.add(image);
     canvas.draw();
   });
@@ -87,53 +118,90 @@ describe('Image', function() {
         y: 0
       }
     });
-    const img = can1.getContext('2d').getImageData(0, 0, 800, 800);
+    const img = can1.getContext('2d')
+      .getImageData(0, 0, 800, 800);
     image.attr('img', img);
     const box = image.getBBox();
-    expect(box.minX).to.equal(0);
-    expect(box.minY).to.equal(0);
-    expect(box.maxX).to.equal(800);
-    expect(box.maxY).to.equal(800);
+    expect(box.minX)
+      .to
+      .equal(0);
+    expect(box.minY)
+      .to
+      .equal(0);
+    expect(box.maxX)
+      .to
+      .equal(800);
+    expect(box.maxY)
+      .to
+      .equal(800);
     canvas.add(image);
     canvas.draw();
     done();
   });
 
   it('width', function() {
-    expect(image.attr('width')).to.equal(768);
+    expect(image.attr('width'))
+      .to
+      .equal(768);
     image.attr('width', 200);
-    expect(image.attr('width')).to.equal(200);
+    expect(image.attr('width'))
+      .to
+      .equal(200);
     const box = image.getBBox();
-    expect(box.minX).to.equal(0);
-    expect(box.maxX).to.equal(200);
+    expect(box.minX)
+      .to
+      .equal(0);
+    expect(box.maxX)
+      .to
+      .equal(200);
     canvas.draw();
   });
 
   it('height', function() {
-    expect(image.attr('height')).to.equal(1024);
+    expect(image.attr('height'))
+      .to
+      .equal(1024);
     image.attr('height', 200);
-    expect(image.attr('height')).to.equal(200);
+    expect(image.attr('height'))
+      .to
+      .equal(200);
     const box = image.getBBox();
-    expect(box.minY).to.equal(0);
-    expect(box.maxY).to.equal(200);
+    expect(box.minY)
+      .to
+      .equal(0);
+    expect(box.maxY)
+      .to
+      .equal(200);
     canvas.draw();
   });
 
   it('x', function() {
     image.attr('x', 10);
-    expect(image.attr('x')).to.equal(10);
+    expect(image.attr('x'))
+      .to
+      .equal(10);
     const box = image.getBBox();
-    expect(box.minX).to.equal(10);
-    expect(box.maxX).to.equal(210);
+    expect(box.minX)
+      .to
+      .equal(10);
+    expect(box.maxX)
+      .to
+      .equal(210);
     canvas.draw();
   });
 
   it('y', function() {
     image.attr('y', 10);
-    expect(image.attr('y')).to.equal(10);
+    expect(image.attr('y'))
+      .to
+      .equal(10);
     const box = image.getBBox();
-    expect(box.minY).to.equal(10);
-    expect(box.maxY).to.equal(210);
+    expect(box.minY)
+      .to
+      .equal(10);
+    expect(box.maxY)
+      .to
+      .equal(210);
     canvas.draw();
   });
 
@@ -155,7 +223,7 @@ describe('Image', function() {
         width: 300,
         height: 300,
         // img: '../fixtures/test2.jpg' // relative to test/unit
-        img: resolve(process.cwd(), './test/fixtures/test1.jpg') // relative to test/unit
+        img: (baseHref + '/test/fixtures/test1.jpg') // relative to test/unit
       }
     });
 
@@ -171,14 +239,14 @@ describe('Image', function() {
     expect(image.isHit(300, 300)).to.be.false;
   });
 
-  it('image onload && image.remove(true)', function() {
-    const image = new G.Image({
-      attrs: {
-        img: 'http://alipay-rmsdeploy-assets-private.cn-hangzhou.alipay.aliyun-inc.com/rmsportal/IHJtPedUbTUPQCx.png'
-      }
-    });
-    canvas.add(image);
-    image.remove(true);
-    canvas.draw();
-  });
+  // it('image onload && image.remove(true)', function() {
+  //   const image = new G.Image({
+  //     attrs: {
+  //       img: 'http://alipay-rmsdeploy-assets-private.cn-hangzhou.alipay.aliyun-inc.com/rmsportal/IHJtPedUbTUPQCx.png'
+  //     }
+  //   });
+  //   canvas.add(image);
+  //   image.remove(true);
+  //   canvas.draw();
+  // });
 });
