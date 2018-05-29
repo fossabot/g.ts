@@ -1,8 +1,18 @@
-const Util = require('../util/index');
-const Element = require('./element');
-const Shape = require('../shape/index');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
+
+import {Element} from './element';
+
+const Util      = require('../util/index');
+const Shape     = require('../shape/index');
 const SHAPE_MAP = {}; // 缓存图形类型
-const INDEX = '_INDEX';
+const INDEX     = '_INDEX';
 
 function find(children, x, y) {
   let rst;
@@ -29,15 +39,6 @@ function getComparer(compare) {
   };
 }
 
-const Group = function(cfg) {
-  Group.superclass.constructor.call(this, cfg);
-  this.set('children', []);
-
-  this._beforeRenderUI();
-  this._renderUI();
-  this._bindUI();
-};
-
 function initClassCfgs(c) {
   if (c.__cfg || c === Group) {
     return;
@@ -52,25 +53,38 @@ function initClassCfgs(c) {
   Util.merge(c.__cfg, c.CFG);
 }
 
-Util.extend(Group, Element);
+export class Group extends Element {
 
-Util.augment(Group, {
-  isGroup: true,
-  canFill: true,
-  canStroke: true,
-  getDefaultCfg() {
+  public isGroup: true;
+  public canFill: true;
+  public canStroke: true;
+
+  constructor(cfg) {
+    super(cfg);
+    this.set('children', []);
+
+    this._beforeRenderUI();
+    this._renderUI();
+    this._bindUI();
+  }
+
+  public getDefaultCfg() {
     initClassCfgs(this.constructor);
     return Util.merge({}, this.constructor.__cfg);
-  },
-  _beforeRenderUI() {},
-  _renderUI() {},
-  _bindUI() {},
-  addShape(type, cfg) {
-    const canvas = this.get('canvas');
-    cfg = cfg || {};
+  }
+
+  public _beforeRenderUI() {}
+
+  public _renderUI() {}
+
+  public _bindUI() {}
+
+  public addShape(type, cfg) {
+    const canvas  = this.get('canvas');
+    cfg           = cfg || {};
     let shapeType = SHAPE_MAP[type];
     if (!shapeType) {
-      shapeType = Util.upperFirst(type);
+      shapeType       = Util.upperFirst(type);
       SHAPE_MAP[type] = shapeType;
     }
     if (cfg.attrs) {
@@ -83,35 +97,36 @@ Util.augment(Group, {
       }
     }
     cfg.canvas = canvas;
-    cfg.type = type;
-    const rst = new Shape[shapeType](cfg);
+    cfg.type   = type;
+    const rst  = new Shape[shapeType](cfg);
     this.add(rst);
     return rst;
-  },
+  }
+
   /** 添加图组
    * @param  {Function|Object|undefined} param 图组类
    * @param  {Object} cfg 配置项
    * @return {Object} rst 图组
    */
-  addGroup(param, cfg) {
+  public addGroup(param, cfg) {
     const canvas = this.get('canvas');
     let rst;
-    cfg = Util.merge({}, cfg);
+    cfg          = Util.merge({}, cfg);
     if (Util.isFunction(param)) {
       if (cfg) {
         cfg.canvas = canvas;
         cfg.parent = this;
-        rst = new param(cfg);
+        rst        = new param(cfg);
       } else {
         rst = new param({
           canvas,
-          parent: this
+          parent: this,
         });
       }
       this.add(rst);
     } else if (Util.isObject(param)) {
       param.canvas = canvas;
-      rst = new Group(param);
+      rst          = new Group(param);
       this.add(rst);
     } else if (param === undefined) {
       rst = new Group();
@@ -120,36 +135,38 @@ Util.augment(Group, {
       return false;
     }
     return rst;
-  },
+  }
+
   /** 绘制背景
    * @param  {Array} padding 内边距
    * @param  {Attrs} attrs 图形属性
    * @param  {Shape} backShape 背景图形
    * @return {Object} 背景层对象
    */
-  renderBack(padding, attrs) {
-    let backShape = this.get('backShape');
+  public renderBack(padding, attrs) {
+    let backShape  = this.get('backShape');
     const innerBox = this.getBBox();
     // const parent = this.get('parent'); // getParent
     Util.merge(attrs, {
-      x: innerBox.minX - padding[3],
-      y: innerBox.minY - padding[0],
-      width: innerBox.width + padding[1] + padding[3],
-      height: innerBox.height + padding[0] + padding[2]
+      x     : innerBox.minX - padding[3],
+      y     : innerBox.minY - padding[0],
+      width : innerBox.width + padding[1] + padding[3],
+      height: innerBox.height + padding[0] + padding[2],
     });
     if (backShape) {
       backShape.attr(attrs);
     } else {
       backShape = this.addShape('rect', {
         zIndex: -1,
-        attrs
+        attrs,
       });
     }
     this.set('backShape', backShape);
     this.sort();
     return backShape;
-  },
-  removeChild(item, destroy) {
+  }
+
+  public removeChild(item, destroy) {
     if (arguments.length >= 2) {
       if (this.contain(item)) {
         item.remove(destroy);
@@ -172,14 +189,15 @@ Util.augment(Group, {
       Group.superclass.remove.call(this, destroy);
     }
     return this;
-  },
+  }
+
   /**
    * 向组中添加shape或者group
    * @param {Object} items 图形或者分组
    * @return {Object} group 本尊
    */
-  add(items) {
-    const self = this;
+  public add(items) {
+    const self     = this;
     const children = self.get('children');
     if (Util.isArray(items)) {
       Util.each(items, function(item) {
@@ -191,7 +209,7 @@ Util.augment(Group, {
       });
       children.push.apply(children, items);
     } else {
-      const item = items;
+      const item   = items;
       const parent = item.get('parent');
       if (parent) {
         parent.removeChild(item, false);
@@ -200,28 +218,33 @@ Util.augment(Group, {
       children.push(item);
     }
     return self;
-  },
-  contain(item) {
+  }
+
+  public contain(item) {
     const children = this.get('children');
     return children.indexOf(item) > -1;
-  },
-  getChildByIndex(index) {
+  }
+
+  public getChildByIndex(index) {
     const children = this.get('children');
     return children[index];
-  },
-  getFirst() {
+  }
+
+  public getFirst() {
     return this.getChildByIndex(0);
-  },
-  getLast() {
+  }
+
+  public getLast() {
     const lastIndex = this.get('children').length - 1;
     return this.getChildByIndex(lastIndex);
-  },
-  __setEvn(item) {
-    const self = this;
-    item.__cfg.parent = self;
+  }
+
+  public __setEvn(item) {
+    const self         = this;
+    item.__cfg.parent  = self;
     item.__cfg.context = self.__cfg.context;
-    item.__cfg.canvas = self.__cfg.canvas;
-    const clip = item.__attrs.clip;
+    item.__cfg.canvas  = self.__cfg.canvas;
+    const clip         = item.__attrs.clip;
     if (clip) {
       clip.setSilent('parent', self);
       clip.setSilent('context', self.get('context'));
@@ -232,13 +255,14 @@ Util.augment(Group, {
         item.__setEvn(child);
       });
     }
-  },
-  getBBox() {
-    const self = this;
-    let minX = Infinity;
-    let maxX = -Infinity;
-    let minY = Infinity;
-    let maxY = -Infinity;
+  }
+
+  public getBBox() {
+    const self     = this;
+    let minX       = Infinity;
+    let maxX       = -Infinity;
+    let minY       = Infinity;
+    let maxY       = -Infinity;
     const children = self.get('children');
     Util.each(children, function(child) {
       if (child.get('visible')) {
@@ -247,10 +271,10 @@ Util.augment(Group, {
           return true;
         }
 
-        const leftTop = [ box.minX, box.minY, 1 ];
-        const leftBottom = [ box.minX, box.maxY, 1 ];
-        const rightTop = [ box.maxX, box.minY, 1 ];
-        const rightBottom = [ box.maxX, box.maxY, 1 ];
+        const leftTop     = [box.minX, box.minY, 1];
+        const leftBottom  = [box.minX, box.maxY, 1];
+        const rightTop    = [box.maxX, box.minY, 1];
+        const rightBottom = [box.maxX, box.maxY, 1];
 
         child.apply(leftTop);
         child.apply(leftBottom);
@@ -279,30 +303,33 @@ Util.augment(Group, {
         }
       }
     });
-    const box = {
+    const box  = {
       minX,
       minY,
       maxX,
-      maxY
+      maxY,
     };
-    box.x = box.minX;
-    box.y = box.minY;
-    box.width = box.maxX - box.minX;
+    box.x      = box.minX;
+    box.y      = box.minY;
+    box.width  = box.maxX - box.minX;
     box.height = box.maxY - box.minY;
     return box;
-  },
-  drawInner(context) {
+  }
+
+  public drawInner(context) {
     const children = this.get('children');
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
       child.draw(context);
     }
     return this;
-  },
-  getCount() {
+  }
+
+  public getCount() {
     return this.get('children').length;
-  },
-  sort() {
+  }
+
+  public sort() {
     const children = this.get('children');
     // 稳定排序
     Util.each(children, (child, index) => {
@@ -315,20 +342,22 @@ Util.augment(Group, {
     }));
 
     return this;
-  },
-  find(id) {
+  }
+
+  public find(id) {
     return this.findBy(function(item) {
       return item.get('id') === id;
     });
-  },
+  }
+
   /**
    * 根据查找函数查找分组或者图形
    * @param  {Function} fn 匹配函数
    * @return {Canvas.Base} 分组或者图形
    */
-  findBy(fn) {
+  public findBy(fn) {
     const children = this.get('children');
-    let rst = null;
+    let rst        = null;
 
     Util.each(children, function(item) {
       if (fn(item)) {
@@ -341,31 +370,33 @@ Util.augment(Group, {
       }
     });
     return rst;
-  },
-  findAllBy(fn) {
+  }
+
+  public findAllBy(fn) {
     const children = this.get('children');
-    let rst = [];
-    let childRst = [];
+    let rst        = [];
+    let childRst   = [];
     Util.each(children, function(item) {
       if (fn(item)) {
         rst.push(item);
       }
       if (item.findAllBy) {
         childRst = item.findAllBy(fn);
-        rst = rst.concat(childRst);
+        rst      = rst.concat(childRst);
       }
     });
     return rst;
-  },
+  }
+
   /**
    * 根据x，y轴坐标获取对应的图形
    * @param  {Number} x x坐标
    * @param  {Number} y y坐标
    * @return {Object}  最上面的图形
    */
-  getShape(x, y) {
-    const self = this;
-    const clip = self.__attrs.clip;
+  public getShape(x, y) {
+    const self     = this;
+    const clip     = self.__attrs.clip;
     const children = self.__cfg.children;
     let rst;
     if (clip) {
@@ -376,8 +407,9 @@ Util.augment(Group, {
       rst = find(children, x, y);
     }
     return rst;
-  },
-  clearTotalMatrix() {
+  }
+
+  public clearTotalMatrix() {
     const m = this.get('totalMatrix');
     if (m) {
       this.setSilent('totalMatrix', null);
@@ -387,22 +419,22 @@ Util.augment(Group, {
         child.clearTotalMatrix();
       }
     }
-  },
-  clear() {
+  }
+
+  public clear() {
     const children = this.get('children');
 
     while (children.length !== 0) {
       children[children.length - 1].remove();
     }
     return this;
-  },
-  destroy() {
+  }
+
+  public destroy() {
     if (this.get('destroyed')) {
       return;
     }
     this.clear();
-    Group.superclass.destroy.call(this);
+    super.destroy();
   }
-});
-
-module.exports = Group;
+}

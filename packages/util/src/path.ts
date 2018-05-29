@@ -1,10 +1,19 @@
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
+
 const Util = require('./common');
 const SPACES = '\x09\x0a\x0b\x0c\x0d\x20\xa0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000\u2028\u2029';
 const PATH_COMMAND = new RegExp('([a-z])[' + SPACES + ',]*((-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?[' + SPACES + ']*,?[' + SPACES + ']*)+)', 'ig');
 const PATH_VALUES = new RegExp('(-?\\d*\\.?\\d*(?:e[\\-+]?\\d+)?)[' + SPACES + ']*,?[' + SPACES + ']*', 'ig');
 
 // Parses given path string into an array of arrays of path segments
-const parsePathString = function(pathString) {
+export const parsePathString = function(pathString) {
   if (!pathString) {
     return null;
   }
@@ -25,11 +34,11 @@ const parsePathString = function(pathString) {
     t: 2,
     v: 1,
     u: 3,
-    z: 0
+    z: 0,
   };
   const data = [];
 
-  String(pathString).replace(PATH_COMMAND, function(a, b, c) {
+  String(pathString).replace(PATH_COMMAND, (a, b, c) => {
     const params = [];
     let name = b.toLowerCase();
     c.replace(PATH_VALUES, function(a, b) {
@@ -59,41 +68,41 @@ const parsePathString = function(pathString) {
 };
 
 // http://schepers.cc/getting-to-the-point
-const catmullRom2bezier = function(crp, z) {
+export const catmullRomTobezier = function(crp, z) {
   const d = [];
   for (let i = 0, iLen = crp.length; iLen - 2 * !z > i; i += 2) {
     const p = [{
       x: +crp[i - 2],
-      y: +crp[i - 1]
+      y: +crp[i - 1],
     }, {
       x: +crp[i],
-      y: +crp[i + 1]
+      y: +crp[i + 1],
     }, {
       x: +crp[i + 2],
-      y: +crp[i + 3]
+      y: +crp[i + 3],
     }, {
       x: +crp[i + 4],
-      y: +crp[i + 5]
+      y: +crp[i + 5],
     }];
     if (z) {
       if (!i) {
         p[0] = {
           x: +crp[iLen - 2],
-          y: +crp[iLen - 1]
+          y: +crp[iLen - 1],
         };
       } else if (iLen - 4 === i) {
         p[3] = {
           x: +crp[0],
-          y: +crp[1]
+          y: +crp[1],
         };
       } else if (iLen - 2 === i) {
         p[2] = {
           x: +crp[0],
-          y: +crp[1]
+          y: +crp[1],
         };
         p[3] = {
           x: +crp[2],
-          y: +crp[3]
+          y: +crp[3],
         };
       }
     } else {
@@ -102,7 +111,7 @@ const catmullRom2bezier = function(crp, z) {
       } else if (!i) {
         p[0] = {
           x: +crp[i],
-          y: +crp[i + 1]
+          y: +crp[i + 1],
         };
       }
     }
@@ -112,14 +121,14 @@ const catmullRom2bezier = function(crp, z) {
       (p[1].x + 6 * p[2].x - p[3].x) / 6,
       (p[1].y + 6 * p[2].y - p[3].y) / 6,
       p[2].x,
-      p[2].y
+      p[2].y,
     ]);
   }
 
   return d;
 };
 
-const ellipsePath = function(x, y, rx, ry, a) {
+export const ellipsePath = function(x, y, rx, ry, a) {
   let res = [];
   if (a === null && ry === null) {
     ry = rx;
@@ -136,7 +145,7 @@ const ellipsePath = function(x, y, rx, ry, a) {
     const y2 = y + rx * Math.sin(-a * rad);
     res = [
       [ 'M', x1, y1 ],
-      [ 'A', rx, rx, 0, +(a - ry > 180), 0, x2, y2 ]
+      [ 'A', rx, rx, 0, +(a - ry > 180), 0, x2, y2 ],
     ];
   } else {
     res = [
@@ -144,18 +153,18 @@ const ellipsePath = function(x, y, rx, ry, a) {
       [ 'm', 0, -ry ],
       [ 'a', rx, ry, 0, 1, 1, 0, 2 * ry ],
       [ 'a', rx, ry, 0, 1, 1, 0, -2 * ry ],
-      [ 'z' ]
+      [ 'z' ],
     ];
   }
   return res;
 };
 
-const pathToAbsolute = function(pathArray) {
+export const pathToAbsolute = function(pathArray) {
   pathArray = parsePathString(pathArray);
 
   if (!pathArray || !pathArray.length) {
     return [
-      [ 'M', 0, 0 ]
+      [ 'M', 0, 0 ],
     ];
   }
   let res = [];
@@ -275,11 +284,11 @@ const pathToAbsolute = function(pathArray) {
   return res;
 };
 
-const l2c = function(x1, y1, x2, y2) {
+export const l2c = function(x1, y1, x2, y2) {
   return [ x1, y1, x2, y2, x2, y2 ];
 };
 
-const q2c = function(x1, y1, ax, ay, x2, y2) {
+export const q2c = function(x1, y1, ax, ay, x2, y2) {
   const _13 = 1 / 3;
   const _23 = 2 / 3;
   return [
@@ -288,11 +297,11 @@ const q2c = function(x1, y1, ax, ay, x2, y2) {
     _13 * x2 + _23 * ax,
     _13 * y2 + _23 * ay,
     x2,
-    y2
+    y2,
   ];
 };
 
-const a2c = function(x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive) {
+export const a2c = function(x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, recursive) {
   // for more information of where this math came from visit:
   // http://www.w3.org/TR/SVG11/implnote.html#ArcImplementationNotes
   if (rx === ry) {
@@ -312,7 +321,7 @@ const a2c = function(x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, 
     const Y = x * Math.sin(rad) + y * Math.cos(rad);
     return {
       x: X,
-      y: Y
+      y: Y,
     };
   };
   if (!recursive) {
@@ -397,7 +406,7 @@ const a2c = function(x1, y1, rx, ry, angle, large_arc_flag, sweep_flag, x2, y2, 
 
 };
 
-const pathTocurve = function(path, path2) {
+export const pathTocurve = function(path, path2) {
   const p = pathToAbsolute(path);
   const p2 = path2 && pathToAbsolute(path2);
   const attrs = {
@@ -408,7 +417,7 @@ const pathTocurve = function(path, path2) {
     X: 0,
     Y: 0,
     qx: null,
-    qy: null
+    qy: null,
   };
   const attrs2 = {
     x: 0,
@@ -418,7 +427,7 @@ const pathTocurve = function(path, path2) {
     X: 0,
     Y: 0,
     qx: null,
-    qy: null
+    qy: null,
   };
   const pcoms1 = []; // path commands of original path p
   const pcoms2 = []; // path commands of original path p2
@@ -432,7 +441,7 @@ const pathTocurve = function(path, path2) {
       return [ 'C', d.x, d.y, d.x, d.y, d.x, d.y ];
     }!(path[0] in {
       T: 1,
-      Q: 1
+      Q: 1,
     }) && (d.qx = d.qy = null);
     switch (path[0]) {
       case 'M':
@@ -518,7 +527,7 @@ const pathTocurve = function(path, path2) {
     }
     p[i] = processPath(p[i], attrs, pcom); // Previous path command is inputted to processPath
 
-    if (pcoms1[i] !== 'A' && pfirst === 'C') pcoms1[i] = 'C'; // A is the only command
+    if (pcoms1[i] !== 'A' && pfirst === 'C') { pcoms1[i] = 'C'; } // A is the only command
     // which may produce multiple C:s
     // so we have to make sure that C is also C in original path
 
@@ -558,17 +567,17 @@ const pathTocurve = function(path, path2) {
 };
 
 const p2s = /,?([a-z]),?/gi;
-const parsePathArray = function(path) {
+export const parsePathArray = function(path) {
   return path.join(',').replace(p2s, '$1');
 };
 
-const base3 = function(t, p1, p2, p3, p4) {
+export const base3 = function(t, p1, p2, p3, p4) {
   const t1 = -3 * p1 + 9 * p2 - 9 * p3 + 3 * p4;
   const t2 = t * t1 + 6 * p1 - 12 * p2 + 6 * p3;
   return t * t2 - 3 * p1 + 3 * p2;
 };
 
-const bezlen = function(x1, y1, x2, y2, x3, y3, x4, y4, z) {
+export const bezlen = function(x1, y1, x2, y2, x3, y3, x4, y4, z) {
   if (z === null) {
     z = 1;
   }
@@ -588,11 +597,11 @@ const bezlen = function(x1, y1, x2, y2, x3, y3, x4, y4, z) {
   return z2 * sum;
 };
 
-const curveDim = function(x0, y0, x1, y1, x2, y2, x3, y3) {
+export const curveDim = function(x0, y0, x1, y1, x2, y2, x3, y3) {
   const tvalues = [];
   const bounds = [
     [],
-    []
+    [],
   ];
   let a;
   let b;
@@ -650,20 +659,19 @@ const curveDim = function(x0, y0, x1, y1, x2, y2, x3, y3) {
   bounds[1][jlen + 1] = y3;
   bounds[0].length = bounds[1].length = jlen + 2;
 
-
   return {
     min: {
       x: Math.min.apply(0, bounds[0]),
-      y: Math.min.apply(0, bounds[1])
+      y: Math.min.apply(0, bounds[1]),
     },
     max: {
       x: Math.max.apply(0, bounds[0]),
-      y: Math.max.apply(0, bounds[1])
-    }
+      y: Math.max.apply(0, bounds[1]),
+    },
   };
 };
 
-const intersect = function(x1, y1, x2, y2, x3, y3, x4, y4) {
+export const intersect = function(x1, y1, x2, y2, x3, y3, x4, y4) {
   if (
     Math.max(x1, x2) < Math.min(x3, x4) ||
     Math.min(x1, x2) > Math.max(x3, x4) ||
@@ -697,18 +705,18 @@ const intersect = function(x1, y1, x2, y2, x3, y3, x4, y4) {
   }
   return {
     x: px,
-    y: py
+    y: py,
   };
 };
 
-const isPointInsideBBox = function(bbox, x, y) {
+export const isPointInsideBBox = function(bbox, x, y) {
   return x >= bbox.x &&
     x <= bbox.x + bbox.width &&
     y >= bbox.y &&
     y <= bbox.y + bbox.height;
 };
 
-const rectPath = function(x, y, w, h, r) {
+export const rectPath = function(x, y, w, h, r) {
   if (r) {
     return [
       [ 'M', +x + (+r), y ],
@@ -720,7 +728,7 @@ const rectPath = function(x, y, w, h, r) {
       [ 'a', r, r, 0, 0, 1, -r, -r ],
       [ 'l', 0, r * 2 - h ],
       [ 'a', r, r, 0, 0, 1, r, -r ],
-      [ 'z' ]
+      [ 'z' ],
     ];
   }
   const res = [
@@ -728,13 +736,13 @@ const rectPath = function(x, y, w, h, r) {
     [ 'l', w, 0 ],
     [ 'l', 0, h ],
     [ 'l', -w, 0 ],
-    [ 'z' ]
+    [ 'z' ],
   ];
   res.parsePathArray = parsePathArray;
   return res;
 };
 
-const box = function(x, y, width, height) {
+export const box = function(x, y, width, height) {
   if (x === null) {
     x = y = width = height = 0;
   }
@@ -759,17 +767,17 @@ const box = function(x, y, width, height) {
     r2: Math.max(width, height) / 2,
     r0: Math.sqrt(width * width + height * height) / 2,
     path: rectPath(x, y, width, height),
-    vb: [ x, y, width, height ].join(' ')
+    vb: [ x, y, width, height ].join(' '),
   };
 };
 
-const isBBoxIntersect = function(bbox1, bbox2) {
+export const isBBoxIntersect = function(bbox1, bbox2) {
   bbox1 = box(bbox1);
   bbox2 = box(bbox2);
   return isPointInsideBBox(bbox2, bbox1.x, bbox1.y) || isPointInsideBBox(bbox2, bbox1.x2, bbox1.y) || isPointInsideBBox(bbox2, bbox1.x, bbox1.y2) || isPointInsideBBox(bbox2, bbox1.x2, bbox1.y2) || isPointInsideBBox(bbox1, bbox2.x, bbox2.y) || isPointInsideBBox(bbox1, bbox2.x2, bbox2.y) || isPointInsideBBox(bbox1, bbox2.x, bbox2.y2) || isPointInsideBBox(bbox1, bbox2.x2, bbox2.y2) || (bbox1.x < bbox2.x2 && bbox1.x > bbox2.x || bbox2.x < bbox1.x2 && bbox2.x > bbox1.x) && (bbox1.y < bbox2.y2 && bbox1.y > bbox2.y || bbox2.y < bbox1.y2 && bbox2.y > bbox1.y);
 };
 
-const bezierBBox = function(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
+export const bezierBBox = function(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
   if (!Util.isArray(p1x)) {
     p1x = [ p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y ];
   }
@@ -778,11 +786,11 @@ const bezierBBox = function(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
     bbox.min.x,
     bbox.min.y,
     bbox.max.x - bbox.min.x,
-    bbox.max.y - bbox.min.y
+    bbox.max.y - bbox.min.y,
   );
 };
 
-const findDotsAtSegment = function(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
+export const findDotsAtSegment = function(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
   const t1 = 1 - t;
   const t13 = Math.pow(t1, 3);
   const t12 = Math.pow(t1, 2);
@@ -805,25 +813,25 @@ const findDotsAtSegment = function(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y, t) {
     y,
     m: {
       x: mx,
-      y: my
+      y: my,
     },
     n: {
       x: nx,
-      y: ny
+      y: ny,
     },
     start: {
       x: ax,
-      y: ay
+      y: ay,
     },
     end: {
       x: cx,
-      y: cy
+      y: cy,
     },
-    alpha
+    alpha,
   };
 };
 
-const interHelper = function(bez1, bez2, justCount) {
+export const interHelper = function(bez1, bez2, justCount) {
   const bbox1 = bezierBBox(bez1);
   const bbox2 = bezierBBox(bez2);
   if (!isBBoxIntersect(bbox1, bbox2)) {
@@ -842,7 +850,7 @@ const interHelper = function(bez1, bez2, justCount) {
     dots1.push({
       x: d.x,
       y: d.y,
-      t: i / n1
+      t: i / n1,
     });
   }
   for (let i = 0; i < n2 + 1; i++) {
@@ -850,7 +858,7 @@ const interHelper = function(bez1, bez2, justCount) {
     dots2.push({
       x: d.x,
       y: d.y,
-      t: i / n2
+      t: i / n2,
     });
   }
   for (let i = 0; i < n1; i++) {
@@ -877,7 +885,7 @@ const interHelper = function(bez1, bez2, justCount) {
               x: is.x,
               y: is.y,
               t1,
-              t2
+              t2,
             });
           }
         }
@@ -887,7 +895,7 @@ const interHelper = function(bez1, bez2, justCount) {
   return res;
 };
 
-const interPathHelper = function(path1, path2, justCount) {
+export const interPathHelper = function(path1, path2, justCount) {
   path1 = pathTocurve(path1);
   path2 = pathTocurve(path2);
   let x1;
@@ -950,16 +958,6 @@ const interPathHelper = function(path1, path2, justCount) {
   return res;
 };
 
-const pathIntersection = function(path1, path2) {
+const intersection = function(path1, path2) {
   return interPathHelper(path1, path2);
-};
-
-module.exports = {
-  parsePathString,
-  parsePathArray,
-  pathTocurve,
-  pathToAbsolute,
-  catmullRomToBezier: catmullRom2bezier,
-  rectPath,
-  intersection: pathIntersection
 };

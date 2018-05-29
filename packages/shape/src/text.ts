@@ -1,3 +1,12 @@
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
+
 const Util = require('../util/index');
 const Shape = require('../core/shape');
 const Inside = require('./util/inside');
@@ -18,7 +27,7 @@ CText.ATTRS = {
   textAlign: 'start',
   textBaseline: 'bottom',
   lineHeight: null,
-  textArr: null
+  textArr: null,
 };
 
 Util.extend(CText, Shape);
@@ -37,7 +46,7 @@ Util.augment(CText, {
       fontWeight: 'normal',
       fontVariant: 'normal',
       textAlign: 'start',
-      textBaseline: 'bottom'
+      textBaseline: 'bottom',
     };
   },
   initTransform() {
@@ -47,7 +56,7 @@ Util.augment(CText, {
       this.transform([
         [ 't', -1 * this.__attrs.x, -1 * this.__attrs.y ],
         [ 's', +fontSize / 12, +fontSize / 12 ],
-        [ 't', this.__attrs.x, this.__attrs.y ]
+        [ 't', this.__attrs.x, this.__attrs.y ],
       ]);
     }
   },
@@ -140,7 +149,7 @@ Util.augment(CText, {
         minX: x,
         minY: y,
         maxX: x,
-        maxY: y
+        maxY: y,
       };
     }
     const height = self.__getTextHeight(); // attrs.height
@@ -149,7 +158,7 @@ Util.augment(CText, {
     const lineWidth = self.getHitLineWidth();
     const point = {
       x,
-      y: y - height
+      y: y - height,
     };
 
     if (textAlign) {
@@ -174,7 +183,7 @@ Util.augment(CText, {
       minX: point.x - halfWidth,
       minY: point.y - halfWidth,
       maxX: point.x + width + halfWidth,
-      maxY: point.y + height + halfWidth
+      maxY: point.y + height + halfWidth,
     };
   },
   __getSpaceingY() {
@@ -234,8 +243,8 @@ Util.augment(CText, {
 
     Util.each(textArr, (subText, index) => {
       subY = y + index * (spaceingY + fontSize) - height + fontSize; // bottom;
-      if (textBaseline === 'middle') subY += height - fontSize - (height - fontSize) / 2;
-      if (textBaseline === 'top') subY += height - fontSize;
+      if (textBaseline === 'middle') { subY += height - fontSize - (height - fontSize) / 2; }
+      if (textBaseline === 'top') { subY += height - fontSize; }
       if (fill) {
         context.fillText(subText, x, subY);
       } else {
@@ -252,12 +261,12 @@ Util.augment(CText, {
     let measureWidth;
     let width = 0;
 
-    if (Util.isNil(text)) return undefined;
+    if (Util.isNil(text)) { return undefined; }
     const context = document.createElement('canvas').getContext('2d');
     context.save();
     context.font = font;
     if (textArr) {
-      Util.each(textArr, subText => {
+      Util.each(textArr, (subText) => {
         measureWidth = context.measureText(subText).width;
         if (width < measureWidth) {
           width = measureWidth;
@@ -269,7 +278,7 @@ Util.augment(CText, {
       context.restore();
     }
     return width;
-  }
+  },
 });
 
 module.exports = CText;

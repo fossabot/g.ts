@@ -1,39 +1,47 @@
-const Util = require('../util/index');
-const Shape = require('../core/shape');
-const Inside = require('./util/inside');
-const Arrow = require('./util/arrow');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
+
+const Util      = require('../util/index');
+const Shape     = require('../core/shape');
+const Inside    = require('./util/inside');
+const Arrow     = require('./util/arrow');
 const CubicMath = require('./math/cubic');
 
-const Cubic = function(cfg) {
-  Cubic.superclass.constructor.call(this, cfg);
-};
+export class Cubic extends Shape {
+  public static ATTRS        = {
+    p1        : null, // 起始点
+    p2        : null, // 第一个控制点
+    p3        : null, // 第二个控制点
+    p4        : null, // 终点
+    lineWidth : 1,
+    startArrow: false,
+    endArrow  : false,
+  };
+  protected canStroke = true;
+  protected type      = 'cubic';
 
-Cubic.ATTRS = {
-  p1: null, // 起始点
-  p2: null, // 第一个控制点
-  p3: null, // 第二个控制点
-  p4: null, // 终点
-  lineWidth: 1,
-  startArrow: false,
-  endArrow: false
-};
+  constructor(cfg) {
+    super(cfg);
+  }
 
-Util.extend(Cubic, Shape);
-
-Util.augment(Cubic, {
-  canStroke: true,
-  type: 'cubic',
-  getDefaultAttrs() {
+  public getDefaultAttrs() {
     return {
-      lineWidth: 1,
+      lineWidth : 1,
       startArrow: false,
-      endArrow: false
+      endArrow  : false,
     };
-  },
-  calculateBox() {
-    const attrs = this.__attrs;
-    const { p1, p2, p3, p4 } = attrs;
-    const lineWidth = this.getHitLineWidth();
+  }
+
+  public calculateBox() {
+    const attrs            = this.__attrs;
+    const {p1, p2, p3, p4} = attrs;
+    const lineWidth        = this.getHitLineWidth();
     let i;
     let l;
 
@@ -62,25 +70,27 @@ Util.augment(Cubic, {
       minX: Math.min.apply(Math, xDim) - halfWidth,
       maxX: Math.max.apply(Math, xDim) + halfWidth,
       minY: Math.min.apply(Math, yDim) - halfWidth,
-      maxY: Math.max.apply(Math, yDim) + halfWidth
+      maxY: Math.max.apply(Math, yDim) + halfWidth,
     };
-  },
-  isPointInPath(x, y) {
-    const attrs = this.__attrs;
-    const { p1, p2, p3, p4 } = attrs;
-    const lineWidth = this.getHitLineWidth();
+  }
+
+  public isPointInPath(x, y) {
+    const attrs            = this.__attrs;
+    const {p1, p2, p3, p4} = attrs;
+    const lineWidth        = this.getHitLineWidth();
     return Inside.cubicline(
       p1[0], p1[1],
       p2[0], p2[1],
       p3[0], p3[1],
       p4[0], p4[1],
-      lineWidth, x, y
+      lineWidth, x, y,
     );
-  },
-  createPath(context) {
-    const attrs = this.__attrs;
-    const { p1, p2, p3, p4 } = attrs;
-    context = context || self.get('context');
+  }
+
+  public createPath(context) {
+    const attrs            = this.__attrs;
+    const {p1, p2, p3, p4} = attrs;
+    context                = context || self.get('context');
     if (
       Util.isNil(p1) ||
       Util.isNil(p2) ||
@@ -96,14 +106,14 @@ Util.augment(Cubic, {
     context.moveTo(p1[0], p1[1]);
     context.bezierCurveTo(p2[0], p2[1], p3[0], p3[1], p4[0], p4[1]);
     Arrow.addEndArrow(context, attrs, p3[0], p3[1], p4[0], p4[1]);
-  },
-  getPoint(t) {
+  }
+
+  public getPoint(t) {
     const attrs = this.__attrs;
     return {
       x: CubicMath.at(attrs.p4[0], attrs.p3[0], attrs.p2[0], attrs.p1[0], t),
-      y: CubicMath.at(attrs.p4[1], attrs.p3[1], attrs.p2[1], attrs.p1[1], t)
+      y: CubicMath.at(attrs.p4[1], attrs.p3[1], attrs.p2[1], attrs.p1[1], t),
     };
   }
-});
 
-module.exports = Cubic;
+}

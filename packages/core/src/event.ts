@@ -1,35 +1,61 @@
-const Util = require('./util/index');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
 
-const Event = function(type, event, bubbles, cancelable) {
-  this.type = type;  // 事件类型
-  this.target = null; // 目标
-  this.currentTarget = null; // 当前目标
-  this.bubbles = bubbles; // 冒泡
-  this.cancelable = cancelable; // 是否能够阻止
-  this.timeStamp = (new Date()).getTime(); // 时间戳
-  this.defaultPrevented = false; // 阻止默认
-  this.propagationStopped = false; // 阻止冒泡
-  this.removed = false; // 是否被移除
-  this.event = event; // 触发的原生事件
-};
+// const Util = require('./util/index');
 
+/**
+ * Event
+ */
+export class Event {
+  public x;
+  public y;
+  public clientX;
+  public clientY;
 
-Util.augment(Event, {
-  preventDefault() {
+  public target             = null; // 目标
+  public currentTarget      = null; // 当前目标
+  public timeStamp          = (new Date()).getTime(); // 时间戳
+  public defaultPrevented   = false; // 阻止默认
+  public propagationStopped = false; // 阻止冒泡
+  public removed            = false; // 是否被移除
+
+  /**
+   * @param type 事件类型
+   * @param event 触发的原生事件
+   * @param bubbles 冒泡
+   * @param cancelable 是否能够阻止
+   */
+  constructor(public type,
+              public event,
+              public bubbles,
+              public cancelable) {
+
+  }
+
+  public preventDefault() {
     this.defaultPrevented = this.cancelable && true;
-  },
-  stopPropagation() {
+  }
+
+  public stopPropagation() {
     this.propagationStopped = true;
-  },
-  remove() {
-    this.remove = true;
-  },
-  clone() {
-    return Util.clone(this);
-  },
-  toString() {
+  }
+
+  public remove() {
+    this.removed = true;
+  }
+
+  // clone() {
+  //   return Util.clone(this);
+  //   return new Event(this.type, this.event, this.bubbles, this.cancelable);
+  // }
+
+  public toString() {
     return '[Event (type=' + this.type + ')]';
   }
-});
-
-module.exports = Event;
+}

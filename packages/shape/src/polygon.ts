@@ -1,31 +1,40 @@
-const Util = require('../util/index');
-const Shape = require('../core/shape');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
+
+const Util   = require('../util/index');
+const Shape  = require('../core/shape');
 const Inside = require('./util/inside');
 
-const Polygon = function(cfg) {
-  Polygon.superclass.constructor.call(this, cfg);
-};
+export class Polygon extends Shape {
+  public static ATTRS        = {
+    points   : null,
+    lineWidth: 1,
+  };
 
-Polygon.ATTRS = {
-  points: null,
-  lineWidth: 1
-};
+  protected canFill   = true;
+  protected canStroke = true;
+  protected type      = 'polygon';
 
-Util.extend(Polygon, Shape);
+  constructor(cfg) {
+    super(cfg);
+  }
 
-Util.augment(Polygon, {
-  canFill: true,
-  canStroke: true,
-  type: 'polygon',
-  getDefaultAttrs() {
+  public getDefaultAttrs() {
     return {
-      lineWidth: 1
+      lineWidth: 1,
     };
-  },
-  calculateBox() {
-    const self = this;
-    const attrs = self.__attrs;
-    const points = attrs.points;
+  }
+
+  public calculateBox() {
+    const self      = this;
+    const attrs     = self.__attrs;
+    const points    = attrs.points;
     const lineWidth = this.getHitLineWidth();
     if (!points || points.length === 0) {
       return null;
@@ -59,12 +68,13 @@ Util.augment(Polygon, {
       minX: minX - halfWidth,
       minY: minY - halfWidth,
       maxX: maxX + halfWidth,
-      maxY: maxY + halfWidth
+      maxY: maxY + halfWidth,
     };
-  },
-  isPointInPath(x, y) {
-    const self = this;
-    const fill = self.hasFill();
+  }
+
+  public isPointInPath(x, y) {
+    const self   = this;
+    const fill   = self.hasFill();
     const stroke = self.hasStroke();
 
     if (fill && stroke) {
@@ -80,16 +90,18 @@ Util.augment(Polygon, {
     }
 
     return false;
-  },
-  __isPointInFill(x, y) {
-    const self = this;
+  }
+
+  public __isPointInFill(x, y) {
+    const self    = this;
     const context = self.get('context');
     self.createPath();
     return context.isPointInPath(x, y);
-  },
-  __isPointInStroke(x, y) {
-    const self = this;
-    const attrs = self.__attrs;
+  }
+
+  public __isPointInStroke(x, y) {
+    const self   = this;
+    const attrs  = self.__attrs;
     const points = attrs.points;
     if (points.length < 2) {
       return false;
@@ -101,10 +113,11 @@ Util.augment(Polygon, {
     }
 
     return Inside.polyline(outPoints, lineWidth, x, y);
-  },
-  createPath(context) {
-    const self = this;
-    const attrs = self.__attrs;
+  }
+
+  public createPath(context) {
+    const self   = this;
+    const attrs  = self.__attrs;
     const points = attrs.points;
     if (points.length < 2) {
       return;
@@ -120,6 +133,4 @@ Util.augment(Polygon, {
     });
     context.closePath();
   }
-});
-
-module.exports = Polygon;
+}

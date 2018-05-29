@@ -1,39 +1,47 @@
-const Util = require('../util/index');
-const Shape = require('../core/shape');
-const Inside = require('./util/inside');
-const Arrow = require('./util/arrow');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
+
+const Util     = require('../util/index');
+const Shape    = require('../core/shape');
+const Inside   = require('./util/inside');
+const Arrow    = require('./util/arrow');
 const LineMath = require('./math/line');
 
-const Polyline = function(cfg) {
-  Polyline.superclass.constructor.call(this, cfg);
-};
+export class Polyline extends Shape {
+  public static ATTRS        = {
+    points    : null,
+    lineWidth : 1,
+    startArrow: false,
+    endArrow  : false,
+    tCache    : null,
+  };
+  protected canStroke = true;
+  protected type      = 'polyline';
+  protected tCache    = null; // 缓存各点的t
 
-Polyline.ATTRS = {
-  points: null,
-  lineWidth: 1,
-  startArrow: false,
-  endArrow: false,
-  tCache: null
-};
+  constructor(cfg) {
+    super(cfg);
+  }
 
-Util.extend(Polyline, Shape);
-
-Util.augment(Polyline, {
-  canStroke: true,
-  type: 'polyline',
-  tCache: null, // 缓存各点的t
-  getDefaultAttrs() {
+  public getDefaultAttrs() {
     return {
-      lineWidth: 1,
+      lineWidth : 1,
       startArrow: false,
-      endArrow: false
+      endArrow  : false,
     };
-  },
-  calculateBox() {
-    const self = this;
-    const attrs = self.__attrs;
+  }
+
+  public calculateBox() {
+    const self      = this;
+    const attrs     = self.__attrs;
     const lineWidth = this.getHitLineWidth();
-    const points = attrs.points;
+    const points    = attrs.points;
     if (!points || points.length === 0) {
       return null;
     }
@@ -66,16 +74,17 @@ Util.augment(Polyline, {
       minX: minX - halfWidth,
       minY: minY - halfWidth,
       maxX: maxX + halfWidth,
-      maxY: maxY + halfWidth
+      maxY: maxY + halfWidth,
     };
-  },
-  __setTcache() {
-    const self = this;
-    const attrs = self.__attrs;
-    const points = attrs.points;
+  }
+
+  public __setTcache() {
+    const self      = this;
+    const attrs     = self.__attrs;
+    const points    = attrs.points;
     let totalLength = 0;
-    let tempLength = 0;
-    const tCache = [];
+    let tempLength  = 0;
+    const tCache    = [];
     let segmentT;
     let segmentL;
     if (!points || points.length === 0) {
@@ -92,18 +101,19 @@ Util.augment(Polyline, {
     }
     Util.each(points, function(p, i) {
       if (points[i + 1]) {
-        segmentT = [];
+        segmentT    = [];
         segmentT[0] = tempLength / totalLength;
-        segmentL = LineMath.len(p[0], p[1], points[i + 1][0], points[i + 1][1]);
+        segmentL    = LineMath.len(p[0], p[1], points[i + 1][0], points[i + 1][1]);
         tempLength += segmentL;
         segmentT[1] = tempLength / totalLength;
         tCache.push(segmentT);
       }
     });
     this.tCache = tCache;
-  },
-  isPointInPath(x, y) {
-    const self = this;
+  }
+
+  public isPointInPath(x, y) {
+    const self  = this;
     const attrs = self.__attrs;
     if (self.hasStroke()) {
       const points = attrs.points;
@@ -114,10 +124,11 @@ Util.augment(Polyline, {
       return Inside.polyline(points, lineWidth, x, y);
     }
     return false;
-  },
-  createPath(context) {
-    const self = this;
-    const attrs = self.__attrs;
+  }
+
+  public createPath(context) {
+    const self   = this;
+    const attrs  = self.__attrs;
     const points = attrs.points;
     let l;
     let i;
@@ -135,11 +146,12 @@ Util.augment(Polyline, {
     }
     context.lineTo(points[l][0], points[l][1]);
     Arrow.addEndArrow(context, attrs, points[l - 1][0], points[l - 1][1], points[l][0], points[l][1]);
-  },
-  getPoint(t) {
-    const attrs = this.__attrs;
+  }
+
+  public getPoint(t) {
+    const attrs  = this.__attrs;
     const points = attrs.points;
-    let tCache = this.tCache;
+    let tCache   = this.tCache;
     let subt;
     let index;
     if (!tCache) {
@@ -148,15 +160,13 @@ Util.augment(Polyline, {
     }
     Util.each(tCache, function(v, i) {
       if (t >= v[0] && t <= v[1]) {
-        subt = (t - v[0]) / (v[1] - v[0]);
+        subt  = (t - v[0]) / (v[1] - v[0]);
         index = i;
       }
     });
     return {
       x: LineMath.at(points[index][0], points[index + 1][0], subt),
-      y: LineMath.at(points[index][1], points[index + 1][1], subt)
+      y: LineMath.at(points[index][1], points[index + 1][1], subt),
     };
   }
-});
-
-module.exports = Polyline;
+}

@@ -1,65 +1,71 @@
-const Util = require('./util/index');
-const Event = require('./event');
-const Group = require('./core/group');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
 
-const Canvas = function(cfg) {
-  Canvas.superclass.constructor.call(this, cfg);
-};
+import {Event, Group} from '@gradii/g/core';
+import {createDom, getRatio, isEmpty, modifyCSS, requestAnimationFrame, uniqueId} from '@gradii/g/util';
 
-Canvas.CFG = {
-  eventEnable: true,
-  /**
-   * 像素宽度
-   * @type {Number}
-   */
-  width: null,
-  /**
-   * 像素高度
-   * @type {Number}
-   */
-  height: null,
-  /**
-   * 画布宽度
-   * @type {Number}
-   */
-  widthCanvas: null,
-  /**
-   * 画布高度
-   * @type {Number}
-   */
-  heightCanvas: null,
-  /**
-   * CSS宽
-   * @type {String}
-   */
-  widthStyle: null,
-  /**
-   * CSS高
-   * @type {String}
-   */
-  heightStyle: null,
-  /**
-   * 容器DOM
-   * @type {Object}
-   */
-  containerDOM: null,
-  /**
-   * 当前Canvas的DOM
-   * @type {Object}
-   */
-  canvasDOM: null,
-  /**
-   * 屏幕像素比
-   * @type {Number}
-   */
-  pixelRatio: null
-};
+export class Canvas extends Group {
+  public static CFG = {
+    eventEnable : true,
+    /**
+     * 像素宽度
+     * @type {Number}
+     */
+    width       : null,
+    /**
+     * 像素高度
+     * @type {Number}
+     */
+    height      : null,
+    /**
+     * 画布宽度
+     * @type {Number}
+     */
+    widthCanvas : null,
+    /**
+     * 画布高度
+     * @type {Number}
+     */
+    heightCanvas: null,
+    /**
+     * CSS宽
+     * @type {String}
+     */
+    widthStyle  : null,
+    /**
+     * CSS高
+     * @type {String}
+     */
+    heightStyle : null,
+    /**
+     * 容器DOM
+     * @type {Object}
+     */
+    containerDOM: null,
+    /**
+     * 当前Canvas的DOM
+     * @type {Object}
+     */
+    canvasDOM   : null,
+    /**
+     * 屏幕像素比
+     * @type {Number}
+     */
+    pixelRatio  : null,
+  };
 
-Util.extend(Canvas, Group);
+  constructor(cfg) {
+    super(cfg);
+  }
 
-Util.augment(Canvas, {
-  init() {
-    Canvas.superclass.init.call(this);
+  public init() {
+    super.init();
     this._setGlobalParam();
     this._setDOM();
     this._setInitSize();
@@ -68,10 +74,11 @@ Util.augment(Canvas, {
     if (this.get('eventEnable')) {
       this._registEvents();
     }
-  },
-  getEmitter(element, event) {
+  }
+
+  public getEmitter(element, event) {
     if (element) {
-      if (Util.isEmpty(element._getEvents())) {
+      if (isEmpty(element._getEvents())) {
         const parent = element.get('parent');
         if (parent && !event.propagationStopped) {
           return this.getEmitter(parent, event);
@@ -80,18 +87,20 @@ Util.augment(Canvas, {
         return element;
       }
     }
-  },
-  _getEventObj(type, e, point, target) {
-    const event = new Event(type, e, true, true);
-    event.x = point.x;
-    event.y = point.y;
-    event.clientX = e.clientX;
-    event.clientY = e.clientY;
+  }
+
+  public _getEventObj(type, e, point, target) {
+    const event         = new Event(type, e, true, true);
+    event.x             = point.x;
+    event.y             = point.y;
+    event.clientX       = e.clientX;
+    event.clientY       = e.clientY;
     event.currentTarget = target;
-    event.target = target;
+    event.target        = target;
     return event;
-  },
-  _triggerEvent(type, e) {
+  }
+
+  public _triggerEvent(type, e) {
     const point = this.getPointByClient(e.clientX, e.clientY);
     const shape = this.getShape(point.x, point.y);
     let emitObj;
@@ -102,13 +111,13 @@ Util.augment(Canvas, {
       const preShape = this.get('preShape');
       if (preShape && preShape !== shape) {
         const mouseleave = this._getEventObj('mouseleave', e, point, preShape);
-        emitObj = this.getEmitter(preShape, e);
+        emitObj          = this.getEmitter(preShape, e);
         emitObj && emitObj.emit('mouseleave', mouseleave);
       }
 
       if (shape) {
         const mousemove = this._getEventObj('mousemove', e, point, shape);
-        emitObj = this.getEmitter(shape, e);
+        emitObj         = this.getEmitter(shape, e);
         emitObj && emitObj.emit('mousemove', mousemove);
 
         if (preShape !== shape) {
@@ -120,7 +129,7 @@ Util.augment(Canvas, {
       this.set('preShape', shape);
     } else {
       const event = this._getEventObj(type, e, point, shape || this);
-      emitObj = this.getEmitter(shape, e);
+      emitObj     = this.getEmitter(shape, e);
       if (emitObj && emitObj !== this) {
         emitObj.emit(type, event);
       }
@@ -131,126 +140,137 @@ Util.augment(Canvas, {
     if (shape && !shape.get('destroyed')) {
       el.style.cursor = shape.attr('cursor') || 'default';
     }
-  },
-  _registEvents() {
-    const self = this;
-    const el = self.get('el');
+  }
 
-    el.addEventListener('mouseout', function(e) {
-      self._triggerEvent('mouseleave', e);
+  public _registEvents() {
+    const el = this.get('el');
+
+    el.addEventListener('mouseout', (e) => {
+      this._triggerEvent('mouseleave', e);
     }, false);
 
-    el.addEventListener('mouseover', function(e) {
-      self._triggerEvent('mouseenter', e);
+    el.addEventListener('mouseover', (e) => {
+      this._triggerEvent('mouseenter', e);
     }, false);
 
-    el.addEventListener('mousemove', function(e) {
-      self._triggerEvent('mousemove', e);
+    el.addEventListener('mousemove', (e) => {
+      this._triggerEvent('mousemove', e);
     }, false);
 
-    el.addEventListener('mousedown', function(e) {
-      self._triggerEvent('mousedown', e);
+    el.addEventListener('mousedown', (e) => {
+      this._triggerEvent('mousedown', e);
     }, false);
 
-    el.addEventListener('mouseup', function(e) {
-      self._triggerEvent('mouseup', e);
+    el.addEventListener('mouseup', (e) => {
+      this._triggerEvent('mouseup', e);
     }, false);
 
-    el.addEventListener('click', function(e) {
-      self._triggerEvent('click', e);
+    el.addEventListener('click', (e) => {
+      this._triggerEvent('click', e);
     }, false);
 
-    el.addEventListener('dblclick', function(e) {
-      self._triggerEvent('dblclick', e);
+    el.addEventListener('dblclick', (e) => {
+      this._triggerEvent('dblclick', e);
     }, false);
 
-    el.addEventListener('touchstart', function(e) {
-      if (!Util.isEmpty(e.touches)) {
-        self._triggerEvent('touchstart', e.touches[0]);
+    el.addEventListener('touchstart', (e) => {
+      if (!isEmpty(e.touches)) {
+        this._triggerEvent('touchstart', e.touches[0]);
       }
     }, false);
 
-    el.addEventListener('touchmove', function(e) {
-      if (!Util.isEmpty(e.touches)) {
-        self._triggerEvent('touchmove', e.touches[0]);
+    el.addEventListener('touchmove', (e) => {
+      if (!isEmpty(e.touches)) {
+        this._triggerEvent('touchmove', e.touches[0]);
       }
     }, false);
 
-    el.addEventListener('touchend', function(e) {
-      if (!Util.isEmpty(e.changedTouches)) {
-        self._triggerEvent('touchend', e.changedTouches[0]);
+    el.addEventListener('touchend', (e) => {
+      if (!isEmpty(e.changedTouches)) {
+        this._triggerEvent('touchend', e.changedTouches[0]);
       }
     }, false);
-  },
-  _scale() {
+  }
+
+  public _scale() {
     const pixelRatio = this.get('pixelRatio');
     this.scale(pixelRatio, pixelRatio);
-  },
-  _setCanvas() {
+  }
+
+  public _setCanvas() {
     const canvasDOM = this.get('canvasDOM');
     this.set('el', canvasDOM);
     this.set('context', canvasDOM.getContext('2d'));
     this.set('canvas', this);
-  },
-  _setGlobalParam() {
+  }
+
+  public _setGlobalParam() {
     const pixelRatio = this.get('pixelRatio');
     if (!pixelRatio) {
-      this.set('pixelRatio', Util.getRatio());
+      this.set('pixelRatio', getRatio());
     }
     return;
-  },
-  _setDOM() {
+  }
+
+  public _setDOM() {
     this._setContainer();
     this._setLayer();
-  },
-  _setContainer() {
+  }
+
+  public _setContainer() {
     const containerId = this.get('containerId');
-    let containerDOM = this.get('containerDOM');
+    let containerDOM  = this.get('containerDOM');
     if (!containerDOM) {
       containerDOM = document.getElementById(containerId);
       this.set('containerDOM', containerDOM);
     }
-    Util.modifyCSS(containerDOM, {
-      position: 'relative'
+    modifyCSS(containerDOM, {
+      position: 'relative',
     });
-  },
-  _setLayer() {
+  }
+
+  public _setLayer() {
     const containerDOM = this.get('containerDOM');
-    const canvasId = Util.uniqueId('canvas_');
+    const canvasId     = uniqueId('canvas_');
     if (containerDOM) {
-      const canvasDOM = Util.createDom('<canvas id="' + canvasId + '"></canvas>');
+      const canvasDOM = createDom('<canvas id="' + canvasId + '"></canvas>');
       containerDOM.appendChild(canvasDOM);
       this.set('canvasDOM', canvasDOM);
     }
-  },
-  _setInitSize() {
-    this.changeSize(this.get('width'), this.get('height'));
-  },
-  _reSize() {
-    const canvasDOM = this.get('canvasDOM');
-    const widthCanvas = this.get('widthCanvas');
-    const heightCanvas = this.get('heightCanvas');
-    const widthStyle = this.get('widthStyle');
-    const heightStyle = this.get('heightStyle');
+  }
 
-    canvasDOM.style.width = widthStyle;
+  public _setInitSize() {
+    this.changeSize(this.get('width'), this.get('height'));
+  }
+
+  public _reSize() {
+    const canvasDOM    = this.get('canvasDOM');
+    const widthCanvas  = this.get('widthCanvas');
+    const heightCanvas = this.get('heightCanvas');
+    const widthStyle   = this.get('widthStyle');
+    const heightStyle  = this.get('heightStyle');
+
+    canvasDOM.style.width  = widthStyle;
     canvasDOM.style.height = heightStyle;
     canvasDOM.setAttribute('width', widthCanvas);
     canvasDOM.setAttribute('height', heightCanvas);
-  },
-  getWidth() {
+  }
+
+  public getWidth() {
     const pixelRatio = this.get('pixelRatio');
-    const width = this.get('width');
+    const width      = this.get('width');
     return width * pixelRatio;
-  },
-  getHeight() {
+  }
+
+  public getHeight() {
     const pixelRatio = this.get('pixelRatio');
-    const height = this.get('height');
+    const height     = this.get('height');
     return height * pixelRatio;
-  },
-  changeSize(width, height) {
-    const pixelRatio = this.get('pixelRatio');
-    const widthCanvas = width * pixelRatio;
+  }
+
+  public changeSize(width, height) {
+    const pixelRatio   = this.get('pixelRatio');
+    const widthCanvas  = width * pixelRatio;
     const heightCanvas = height * pixelRatio;
 
     this.set('widthCanvas', widthCanvas);
@@ -260,83 +280,88 @@ Util.augment(Canvas, {
     this.set('width', width);
     this.set('height', height);
     this._reSize();
-  },
+  }
+
   /**
    * 将窗口坐标转变成 canvas 坐标
    * @param  {Number} clientX 窗口x坐标
    * @param  {Number} clientY 窗口y坐标
    * @return {Object} canvas坐标
    */
-  getPointByClient(clientX, clientY) {
-    const el = this.get('el');
-    const bbox = el.getBoundingClientRect();
-    const width = bbox.right - bbox.left;
+  public getPointByClient(clientX, clientY) {
+    const el     = this.get('el');
+    const bbox   = el.getBoundingClientRect();
+    const width  = bbox.right - bbox.left;
     const height = bbox.bottom - bbox.top;
     return {
       x: (clientX - bbox.left) * (el.width / width),
-      y: (clientY - bbox.top) * (el.height / height)
+      y: (clientY - bbox.top) * (el.height / height),
     };
-  },
-  getClientByPoint(x, y) {
-    const el = this.get('el');
-    const bbox = el.getBoundingClientRect();
-    const width = bbox.right - bbox.left;
+  }
+
+  public getClientByPoint(x, y) {
+    const el     = this.get('el');
+    const bbox   = el.getBoundingClientRect();
+    const width  = bbox.right - bbox.left;
     const height = bbox.bottom - bbox.top;
     return {
       clientX: x / (el.width / width) + bbox.left,
-      clientY: y / (el.height / height) + bbox.top
+      clientY: y / (el.height / height) + bbox.top,
     };
-  },
-  beforeDraw() {
+  }
+
+  public beforeDraw() {
     const context = this.get('context');
-    const el = this.get('el');
+    const el      = this.get('el');
     context && context.clearRect(0, 0, el.width, el.height);
-  },
-  _beginDraw() {
+  }
+
+  public _beginDraw() {
     this.setSilent('toDraw', true);
-  },
-  _endDraw() {
+  }
+
+  public _endDraw() {
     this.setSilent('toDraw', false);
-  },
-  draw() {
-    const self = this;
+  }
+
+  public draw() {
     function drawInner() {
-      self.setSilent('animateHandler', Util.requestAnimationFrame(() => {
-        self.setSilent('animateHandler', undefined);
-        if (self.get('toDraw')) {
+      this.setSilent('animateHandler', requestAnimationFrame(() => {
+        this.setSilent('animateHandler', undefined);
+        if (this.get('toDraw')) {
           drawInner();
         }
       }));
-      self.beforeDraw();
+      this.beforeDraw();
       try {
-        const context = self.get('context');
-        Canvas.superclass.draw.call(self, context);
-        // self._drawCanvas();
+        const context = this.get('context');
+        super.draw(context);
+        // this._drawCanvas();
       } catch (ev) { // 绘制时异常，中断重绘
         console.warn('error in draw canvas, detail as:');
         console.warn(ev);
-        self._endDraw();
+        this._endDraw();
       }
-      self._endDraw();
+      this._endDraw();
     }
 
-    if (self.get('destroyed')) {
+    if (this.get('destroyed')) {
       return;
     }
-    if (self.get('animateHandler')) {
+    if (this.get('animateHandler')) {
       this._beginDraw();
     } else {
       drawInner();
     }
-  },
-  destroy() {
+  }
+
+  public destroy() {
     const containerDOM = this.get('containerDOM');
-    const canvasDOM = this.get('canvasDOM');
+    const canvasDOM    = this.get('canvasDOM');
     if (canvasDOM && containerDOM) {
       containerDOM.removeChild(canvasDOM);
     }
-    Canvas.superclass.destroy.call(this);
+    super.destroy();
   }
-});
 
-module.exports = Canvas;
+}

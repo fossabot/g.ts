@@ -1,49 +1,56 @@
-const Util = require('../util/index');
-const Shape = require('../core/shape');
-const Inside = require('./util/inside');
-const ArcMath = require('./math/arc');
-const vec2 = require('../util/matrix').vec2;
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
 
-const Fan = function(cfg) {
-  Fan.superclass.constructor.call(this, cfg);
-};
+import {Shape, Util, vec2} from '@gradii/g/core';
+import {ArcMath} from './math/arc';
+import {Inside} from './util/inside';
 
-Fan.ATTRS = {
-  x: 0,
-  y: 0,
-  rs: 0,
-  re: 0,
-  startAngle: 0,
-  endAngle: 0,
-  clockwise: false,
-  lineWidth: 1
-};
+export class Fan extends Shape {
+  public static ATTRS = {
+    x         : 0,
+    y         : 0,
+    rs        : 0,
+    re        : 0,
+    startAngle: 0,
+    endAngle  : 0,
+    clockwise : false,
+    lineWidth : 1,
+  };
 
-Util.extend(Fan, Shape);
+  private canFill   = true;
+  private canStroke = true;
+  private type      = 'fan';
 
-Util.augment(Fan, {
-  canFill: true,
-  canStroke: true,
-  type: 'fan',
-  getDefaultAttrs() {
+  constructor(cfg) {
+    super(cfg);
+  }
+
+  public getDefaultAttrs() {
     return {
       clockwise: false,
       lineWidth: 1,
-      rs: 0,
-      re: 0
+      rs       : 0,
+      re       : 0,
     };
-  },
-  calculateBox() {
-    const self = this;
-    const attrs = self.__attrs;
-    const cx = attrs.x;
-    const cy = attrs.y;
-    const rs = attrs.rs;
-    const re = attrs.re;
+  }
+
+  public calculateBox() {
+    const self       = this;
+    const attrs      = self.__attrs;
+    const cx         = attrs.x;
+    const cy         = attrs.y;
+    const rs         = attrs.rs;
+    const re         = attrs.re;
     const startAngle = attrs.startAngle;
-    const endAngle = attrs.endAngle;
-    const clockwise = attrs.clockwise;
-    const lineWidth = this.getHitLineWidth();
+    const endAngle   = attrs.endAngle;
+    const clockwise  = attrs.clockwise;
+    const lineWidth  = this.getHitLineWidth();
 
     const boxs = ArcMath.box(cx, cy, rs, startAngle, endAngle, clockwise);
     const boxe = ArcMath.box(cx, cy, re, startAngle, endAngle, clockwise);
@@ -57,11 +64,12 @@ Util.augment(Fan, {
       minX: minX - halfWidth,
       minY: minY - halfWidth,
       maxX: maxX + halfWidth,
-      maxY: maxY + halfWidth
+      maxY: maxY + halfWidth,
     };
-  },
-  isPointInPath(x, y) {
-    const fill = this.hasFill();
+  }
+
+  public isPointInPath(x, y) {
+    const fill   = this.hasFill();
     const stroke = this.hasStroke();
 
     if (fill && stroke) {
@@ -76,20 +84,20 @@ Util.augment(Fan, {
       return this.__isPointInStroke(x, y);
     }
     return false;
-  },
-  __isPointInFill(x, y) {
-    const attrs = this.__attrs;
-    const cx = attrs.x;
-    const cy = attrs.y;
-    const rs = attrs.rs;
-    const re = attrs.re;
-    const startAngle = attrs.startAngle;
-    const endAngle = attrs.endAngle;
-    const clockwise = attrs.clockwise;
-    const v1 = [ 1, 0 ];
-    const subv = [ x - cx, y - cy ];
-    const angle = vec2.angleTo(v1, subv);
+  }
 
+  public __isPointInFill(x, y) {
+    const attrs      = this.__attrs;
+    const cx         = attrs.x;
+    const cy         = attrs.y;
+    const rs         = attrs.rs;
+    const re         = attrs.re;
+    const startAngle = attrs.startAngle;
+    const endAngle   = attrs.endAngle;
+    const clockwise  = attrs.clockwise;
+    const v1         = [1, 0];
+    const subv       = [x - cx, y - cy];
+    const angle      = vec2.angleTo(v1, subv);
 
     const angle1 = ArcMath.nearAngle(angle, startAngle, endAngle, clockwise);
 
@@ -100,33 +108,34 @@ Util.augment(Fan, {
       }
     }
     return false;
-  },
-  __isPointInStroke(x, y) {
-    const attrs = this.__attrs;
-    const cx = attrs.x;
-    const cy = attrs.y;
-    const rs = attrs.rs;
-    const re = attrs.re;
+  }
+
+  public __isPointInStroke(x, y) {
+    const attrs      = this.__attrs;
+    const cx         = attrs.x;
+    const cy         = attrs.y;
+    const rs         = attrs.rs;
+    const re         = attrs.re;
     const startAngle = attrs.startAngle;
-    const endAngle = attrs.endAngle;
-    const clockwise = attrs.clockwise;
-    const lineWidth = this.getHitLineWidth();
+    const endAngle   = attrs.endAngle;
+    const clockwise  = attrs.clockwise;
+    const lineWidth  = this.getHitLineWidth();
 
     const ssp = {
       x: Math.cos(startAngle) * rs + cx,
-      y: Math.sin(startAngle) * rs + cy
+      y: Math.sin(startAngle) * rs + cy,
     };
     const sep = {
       x: Math.cos(startAngle) * re + cx,
-      y: Math.sin(startAngle) * re + cy
+      y: Math.sin(startAngle) * re + cy,
     };
     const esp = {
       x: Math.cos(endAngle) * rs + cx,
-      y: Math.sin(endAngle) * rs + cy
+      y: Math.sin(endAngle) * rs + cy,
     };
     const eep = {
       x: Math.cos(endAngle) * re + cx,
-      y: Math.sin(endAngle) * re + cy
+      y: Math.sin(endAngle) * re + cy,
     };
 
     if (Inside.line(ssp.x, ssp.y, sep.x, sep.y, lineWidth, x, y)) {
@@ -146,28 +155,29 @@ Util.augment(Fan, {
     }
 
     return false;
-  },
-  createPath(context) {
-    const attrs = this.__attrs;
-    const cx = attrs.x;
-    const cy = attrs.y;
-    const rs = attrs.rs;
-    const re = attrs.re;
+  }
+
+  public createPath(context) {
+    const attrs      = this.__attrs;
+    const cx         = attrs.x;
+    const cy         = attrs.y;
+    const rs         = attrs.rs;
+    const re         = attrs.re;
     const startAngle = attrs.startAngle;
-    const endAngle = attrs.endAngle;
-    const clockwise = attrs.clockwise;
+    const endAngle   = attrs.endAngle;
+    const clockwise  = attrs.clockwise;
 
     const ssp = {
       x: Math.cos(startAngle) * rs + cx,
-      y: Math.sin(startAngle) * rs + cy
+      y: Math.sin(startAngle) * rs + cy,
     };
     const sep = {
       x: Math.cos(startAngle) * re + cx,
-      y: Math.sin(startAngle) * re + cy
+      y: Math.sin(startAngle) * re + cy,
     };
     const esp = {
       x: Math.cos(endAngle) * rs + cx,
-      y: Math.sin(endAngle) * rs + cy
+      y: Math.sin(endAngle) * rs + cy,
     };
 
     context = context || self.get('context');
@@ -179,6 +189,5 @@ Util.augment(Fan, {
     context.arc(cx, cy, rs, endAngle, startAngle, !clockwise);
     context.closePath();
   }
-});
 
-module.exports = Fan;
+}

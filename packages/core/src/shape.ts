@@ -1,24 +1,33 @@
-const Util = require('../util/index');
-const Element = require('./element');
-const Inside = require('../shape/util/inside');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
 
-const Shape = function(cfg) {
-  Shape.superclass.constructor.call(this, cfg);
-};
+import {Inside} from '@gradii/g/core';
+import Util from '../util/index';
+import {Element} from './element';
 
-Shape.ATTRS = {};
+export class Shape extends Element {
+  public static ATTRS = {};
 
-Util.extend(Shape, Element);
+  constructor(cfg) {
+    super(cfg);
+  }
 
-Util.augment(Shape, {
-  isShape: true,
-  createPath() {},
-  drawInner(context) {
-    const self = this;
-    const attrs = self.__attrs;
-    self.createPath(context);
+  private isShape = true;
+
+  public createPath(...args) {
+  }
+
+  public drawInner(context) {
+    const attrs = this.__attrs;
+    this.createPath(context);
     const originOpacity = context.globalAlpha;
-    if (self.hasFill()) {
+    if (this.hasFill()) {
       const fillOpacity = attrs.fillOpacity;
       if (!Util.isNil(fillOpacity) && fillOpacity !== 1) {
         context.globalAlpha = fillOpacity;
@@ -28,8 +37,8 @@ Util.augment(Shape, {
         context.fill();
       }
     }
-    if (self.hasStroke()) {
-      const lineWidth = self.__attrs.lineWidth;
+    if (this.hasStroke()) {
+      const lineWidth = this.__attrs.lineWidth;
       if (lineWidth > 0) {
         const strokeOpacity = attrs.strokeOpacity;
         if (!Util.isNil(strokeOpacity) && strokeOpacity !== 1) {
@@ -38,92 +47,98 @@ Util.augment(Shape, {
         context.stroke();
       }
     }
-  },
+  }
+
   /**
    * 节点是否在图形中
    * @param  {Number}  x x 坐标
    * @param  {Number}  y y 坐标
    * @return {Boolean}  是否在图形中
    */
-  isPointInPath() {
+  public isPointInPath(...args) {
     return false;
-  },
+  }
+
   /**
    * 击中图形时是否进行包围盒判断
    * @return {Boolean} [description]
    */
-  isHitBox() {
+  public isHitBox() {
     return true;
-  },
+  }
+
   /**
    * 节点是否能够被击中
    * @param {Number} x x坐标
    * @param {Number} y y坐标
    * @return {Boolean} 是否在图形中
    */
-  isHit(x, y) {
+  public isHit(x, y) {
     const self = this;
-    const v = [ x, y, 1 ];
-    self.invert(v); // canvas
+    const v    = [x, y, 1];
+    this.invert(v); // canvas
 
-    if (self.isHitBox()) {
-      const box = self.getBBox();
+    if (this.isHitBox()) {
+      const box = this.getBBox();
       if (box && !Inside.box(box.minX, box.maxX, box.minY, box.maxY, v[0], v[1])) {
         return false;
       }
     }
-    const clip = self.__attrs.clip;
+    const clip = this.__attrs.clip;
     if (clip) {
       if (clip.inside(x, y)) {
-        return self.isPointInPath(v[0], v[1]);
+        return this.isPointInPath(v[0], v[1]);
       }
     } else {
-      return self.isPointInPath(v[0], v[1]);
+      return this.isPointInPath(v[0], v[1]);
     }
     return false;
-  },
+  }
+
   /**
    * @protected
    * 计算包围盒
    * @return {Object} 包围盒
    */
-  calculateBox() {
+  public calculateBox() {
     return null;
-  },
+  }
+
   // 获取拾取时线的宽度，需要考虑附加的线的宽度
-  getHitLineWidth() {
+  public getHitLineWidth() {
     const attrs = this.__attrs;
     // if (!attrs.stroke) {
     //   return 0;
     // }
     const lineAppendWidth = attrs.lineAppendWidth || 0;
-    const lineWidth = attrs.lineWidth || 0;
+    const lineWidth       = attrs.lineWidth || 0;
     return lineWidth + lineAppendWidth;
-  },
+  }
+
   // 清除当前的矩阵
-  clearTotalMatrix() {
+  public clearTotalMatrix() {
     this.__cfg.totalMatrix = null;
+    this.__cfg.region      = null;
+  }
+
+  public clearBBox() {
+    this.__cfg.box    = null;
     this.__cfg.region = null;
-  },
-  clearBBox() {
-    this.__cfg.box = null;
-    this.__cfg.region = null;
-  },
-  getBBox() {
+  }
+
+  public getBBox() {
     let box = this.__cfg.box;
     // 延迟计算
     if (!box) {
       box = this.calculateBox();
       if (box) {
-        box.x = box.minX;
-        box.y = box.minY;
-        box.width = box.maxX - box.minX;
+        box.x      = box.minX;
+        box.y      = box.minY;
+        box.width  = box.maxX - box.minX;
         box.height = box.maxY - box.minY;
       }
       this.__cfg.box = box;
     }
     return box;
   }
-});
-
-module.exports = Shape;
+}

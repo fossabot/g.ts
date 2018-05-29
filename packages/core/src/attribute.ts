@@ -1,70 +1,85 @@
-const Util = require('../../util/index');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
 
-const ALIAS_ATTRS = [ 'strokeStyle', 'fillStyle', 'globalAlpha' ];
-const CLIP_SHAPES = [ 'circle', 'ellipse', 'fan', 'polygon', 'rect', 'path' ];
+import {EventEmitter} from '@gradii/g/event-emitter';
+import {isObject} from 'util';
+
+const ALIAS_ATTRS           = ['strokeStyle', 'fillStyle', 'globalAlpha'];
+const CLIP_SHAPES           = ['circle', 'ellipse', 'fan', 'polygon', 'rect', 'path'];
 const CAPITALIZED_ATTRS_MAP = {
-  r: 'R',
-  opacity: 'Opacity',
-  lineWidth: 'LineWidth',
-  clip: 'Clip',
-  stroke: 'Stroke',
-  fill: 'Fill',
+  r            : 'R',
+  opacity      : 'Opacity',
+  lineWidth    : 'LineWidth',
+  clip         : 'Clip',
+  stroke       : 'Stroke',
+  fill         : 'Fill',
   strokeOpacity: 'Stroke',
-  fillOpacity: 'Fill',
-  x: 'X',
-  y: 'Y',
-  rx: 'Rx',
-  ry: 'Ry',
-  re: 'Re',
-  rs: 'Rs',
-  width: 'Width',
-  height: 'Height',
-  img: 'Img',
-  x1: 'X1',
-  x2: 'X2',
-  y1: 'Y1',
-  y2: 'Y2',
-  points: 'Points',
-  p1: 'P1',
-  p2: 'P2',
-  p3: 'P3',
-  p4: 'P4',
-  text: 'Text',
-  radius: 'Radius',
-  textAlign: 'TextAlign',
-  textBaseline: 'TextBaseline',
-  font: 'Font',
-  fontSize: 'FontSize',
-  fontStyle: 'FontStyle',
-  fontVariant: 'FontVariant',
-  fontWeight: 'FontWeight',
-  fontFamily: 'FontFamily',
-  clockwise: 'Clockwise',
-  startAngle: 'StartAngle',
-  endAngle: 'EndAngle',
-  path: 'Path'
+  fillOpacity  : 'Fill',
+  x            : 'X',
+  y            : 'Y',
+  rx           : 'Rx',
+  ry           : 'Ry',
+  re           : 'Re',
+  rs           : 'Rs',
+  width        : 'Width',
+  height       : 'Height',
+  img          : 'Img',
+  x1           : 'X1',
+  x2           : 'X2',
+  y1           : 'Y1',
+  y2           : 'Y2',
+  points       : 'Points',
+  p1           : 'P1',
+  p2           : 'P2',
+  p3           : 'P3',
+  p4           : 'P4',
+  text         : 'Text',
+  radius       : 'Radius',
+  textAlign    : 'TextAlign',
+  textBaseline : 'TextBaseline',
+  font         : 'Font',
+  fontSize     : 'FontSize',
+  fontStyle    : 'FontStyle',
+  fontVariant  : 'FontVariant',
+  fontWeight   : 'FontWeight',
+  fontFamily   : 'FontFamily',
+  clockwise    : 'Clockwise',
+  startAngle   : 'StartAngle',
+  endAngle     : 'EndAngle',
+  path         : 'Path',
 };
-const ALIAS_ATTRS_MAP = {
-  stroke: 'strokeStyle',
-  fill: 'fillStyle',
-  opacity: 'globalAlpha'
+const ALIAS_ATTRS_MAP       = {
+  stroke : 'strokeStyle',
+  fill   : 'fillStyle',
+  opacity: 'globalAlpha',
 };
 
-module.exports = {
-  canFill: false,
-  canStroke: false,
-  initAttrs(attrs) {
+export class Attribute extends EventEmitter {
+  public canFill   = false;
+  public canStroke = false;
+
+  protected __attrs;
+
+  public initAttrs(attrs) {
     this.__attrs = {
-      opacity: 1,
-      fillOpacity: 1,
-      strokeOpacity: 1
+      opacity      : 1,
+      fillOpacity  : 1,
+      strokeOpacity: 1,
     };
-    this.attr(Util.assign(this.getDefaultAttrs(), attrs));
+    this.attr({...this.getDefaultAttrs(), ...attrs});
     return this;
-  },
-  getDefaultAttrs() {
+  }
+
+  public getDefaultAttrs() {
     return {};
-  },
+  }
+
   /**
    * 设置或者设置属性，有以下 4 种情形：
    *   - name 不存在, 则返回属性集合
@@ -76,95 +91,102 @@ module.exports = {
    * @param  {*} value 属性值
    * @return {*} 属性值
    */
-  attr(name, value) {
-    const self = this;
+  public attr(name, value?) {
     if (arguments.length === 0) {
-      return self.__attrs;
+      return this.__attrs;
     }
 
-    if (Util.isObject(name)) {
+    if (isObject(name)) {
       for (const k in name) {
         if (ALIAS_ATTRS.indexOf(k) === -1) {
           const v = name[k];
-          self._setAttr(k, v);
+          this._setAttr(k, v);
         }
       }
-      if (self.__afterSetAttrAll) {
-        self.__afterSetAttrAll(name);
+      if (this.__afterSetAttrAll) {
+        this.__afterSetAttrAll(name);
       }
-      // self.setSilent('box', null);
-      self.clearBBox();
+      // this.setSilent('box', null);
+      this.clearBBox();
       return self;
     }
     if (arguments.length === 2) {
-      if (self._setAttr(name, value) !== false) {
+      if (this._setAttr(name, value) !== false) {
         const m = '__afterSetAttr' + CAPITALIZED_ATTRS_MAP[name];
         if (self[m]) {
           self[m](value);
         }
       }
-      // self.setSilent('box', null);
-      self.clearBBox();
+      // this.setSilent('box', null);
+      this.clearBBox();
       return self;
     }
-    return self._getAttr(name);
-  },
-  clearBBox() {
-    this.setSilent('box', null);
-  },
-  __afterSetAttrAll() {
+    return this._getAttr(name);
+  }
 
-  },
+  public clearBBox() {
+    this.setSilent('box', null);
+  }
+
+  public __afterSetAttrAll(...args) {
+
+  }
+
   // 属性获取触发函数
-  _getAttr(name) {
+  public _getAttr(name) {
     return this.__attrs[name];
-  },
+  }
+
   // 属性设置触发函数
-  _setAttr(name, value) {
-    const self = this;
+  public _setAttr(name, value): this {
     if (name === 'clip') {
-      self.__setAttrClip(value);
-      self.__attrs.clip = value;
+      this.__setAttrClip(value);
+      this.__attrs.clip = value;
     } else if (name === 'transform') {
-      self.__setAttrTrans(value);
+      this.__setAttrTrans(value);
     } else {
-      self.__attrs[name] = value;
-      const alias = ALIAS_ATTRS_MAP[name];
+      this.__attrs[name] = value;
+      const alias        = ALIAS_ATTRS_MAP[name];
       if (alias) {
-        self.__attrs[alias] = value;
+        this.__attrs[alias] = value;
       }
     }
-    return self;
-  },
-  hasFill() {
+    return this;
+  }
+
+  public hasFill() {
     return this.canFill && this.__attrs.fillStyle;
-  },
-  hasStroke() {
+  }
+
+  public hasStroke() {
     return this.canStroke && this.__attrs.strokeStyle;
-  },
+  }
+
   // 设置透明度
-  __setAttrOpacity(v) {
+  public __setAttrOpacity(v) {
     this.__attrs.globalAlpha = v;
     return v;
-  },
-  __setAttrClip(clip) {
+  }
+
+  public __setAttrClip(clip) {
     const self = this;
     if (clip && (CLIP_SHAPES.indexOf(clip.type) > -1)) {
       if (clip.get('canvas') === null) {
         clip = Util.clone(clip);
       }
-      clip.set('parent', self.get('parent'));
-      clip.set('context', self.get('context'));
+      clip.set('parent', this.get('parent'));
+      clip.set('context', this.get('context'));
       clip.inside = function(x, y) {
-        const v = [ x, y, 1 ];
-        clip.invert(v, self.get('canvas')); // 已经在外面转换
+        const v = [x, y, 1];
+        clip.invert(v, this.get('canvas')); // 已经在外面转换
         return clip.__isPointInFill(v[0], v[1]);
       };
       return clip;
     }
     return null;
-  },
-  __setAttrTrans(value) {
+  }
+
+  public __setAttrTrans(value) {
     return this.transform(value);
   }
-};
+}

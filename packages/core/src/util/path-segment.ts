@@ -1,24 +1,33 @@
-const Util = require('../../util/index');
-const Inside = require('./inside');
-const Cubic = require('../math/cubic');
-const Quadratic = require('../math/quadratic');
-const Ellipse = require('../math/ellipse');
-const vec3 = require('../../util/matrix').vec3;
-const mat3 = require('../../util/matrix').mat3;
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
 
-const ARR_CMD = [ 'm', 'l', 'c', 'a', 'q', 'h', 'v', 't', 's', 'z' ];
+const Util      = require('../../util/index');
+const Inside    = require('./inside');
+const Cubic     = require('../math/cubic');
+const Quadratic = require('../math/quadratic');
+const Ellipse   = require('../math/ellipse');
+const vec3      = require('../../util/matrix').vec3;
+const mat3      = require('../../util/matrix').mat3;
+
+const ARR_CMD = ['m', 'l', 'c', 'a', 'q', 'h', 'v', 't', 's', 'z'];
 
 function toAbsolute(x, y, curPoint) { // 获取绝对坐标
   return {
     x: curPoint.x + x,
-    y: curPoint.y + y
+    y: curPoint.y + y,
   };
 }
 
 function toSymmetry(point, center) { // 点对称
   return {
     x: center.x + (center.x - point.x),
-    y: center.y + (center.y - point.y)
+    y: center.y + (center.y - point.y),
   };
 }
 
@@ -35,13 +44,13 @@ function vAngle(u, v) {
 }
 
 function getArcParams(point1, point2, fa, fs, rx, ry, psiDeg) {
-  const psi = Util.mod(Util.toRadian(psiDeg), Math.PI * 2);
-  const x1 = point1.x;
-  const y1 = point1.y;
-  const x2 = point2.x;
-  const y2 = point2.y;
-  const xp = Math.cos(psi) * (x1 - x2) / 2.0 + Math.sin(psi) * (y1 - y2) / 2.0;
-  const yp = -1 * Math.sin(psi) * (x1 - x2) / 2.0 + Math.cos(psi) * (y1 - y2) / 2.0;
+  const psi    = Util.mod(Util.toRadian(psiDeg), Math.PI * 2);
+  const x1     = point1.x;
+  const y1     = point1.y;
+  const x2     = point2.x;
+  const y2     = point2.y;
+  const xp     = Math.cos(psi) * (x1 - x2) / 2.0 + Math.sin(psi) * (y1 - y2) / 2.0;
+  const yp     = -1 * Math.sin(psi) * (x1 - x2) / 2.0 + Math.cos(psi) * (y1 - y2) / 2.0;
   const lambda = (xp * xp) / (rx * rx) + (yp * yp) / (ry * ry);
 
   if (lambda > 1) {
@@ -64,10 +73,10 @@ function getArcParams(point1, point2, fa, fs, rx, ry, psiDeg) {
   const cx = (x1 + x2) / 2.0 + Math.cos(psi) * cxp - Math.sin(psi) * cyp;
   const cy = (y1 + y2) / 2.0 + Math.sin(psi) * cxp + Math.cos(psi) * cyp;
 
-  const theta = vAngle([ 1, 0 ], [ (xp - cxp) / rx, (yp - cyp) / ry ]);
-  const u = [ (xp - cxp) / rx, (yp - cyp) / ry ];
-  const v = [ (-1 * xp - cxp) / rx, (-1 * yp - cyp) / ry ];
-  let dTheta = vAngle(u, v);
+  const theta = vAngle([1, 0], [(xp - cxp) / rx, (yp - cyp) / ry]);
+  const u     = [(xp - cxp) / rx, (yp - cyp) / ry];
+  const v     = [(-1 * xp - cxp) / rx, (-1 * yp - cyp) / ry];
+  let dTheta  = vAngle(u, v);
 
   if (vRatio(u, v) <= -1) {
     dTheta = Math.PI;
@@ -81,27 +90,37 @@ function getArcParams(point1, point2, fa, fs, rx, ry, psiDeg) {
   if (fs === 1 && dTheta < 0) {
     dTheta = dTheta + 2 * Math.PI;
   }
-  return [ point1, cx, cy, rx, ry, theta, dTheta, psi, fs ];
+  return [point1, cx, cy, rx, ry, theta, dTheta, psi, fs];
 }
 
-const PathSegment = function(item, preSegment, isLast) {
-  this.preSegment = preSegment;
-  this.isLast = isLast;
-  this.init(item, preSegment);
-};
+export class PathSegment {
+  private command: string;
+  private preSegment: any;
+  private isLast: any;
+  private params: Array<{ x: number; y: number } | { x; y } | any>;
+  private subStart: any;
+  private endPoint: any;
+  private endTangent: () => Array<number>;
+  private startTangent: () => Array<number>;
+  private box: any;
 
-Util.augment(PathSegment, {
-  init(item, preSegment) {
-    const command = item[0];
-    preSegment = preSegment || {
+  constructor(item, preSegment, isLast) {
+    this.preSegment = preSegment;
+    this.isLast     = isLast;
+    this.init(item, preSegment);
+  }
+
+  public init(item, preSegment) {
+    const command     = item[0];
+    preSegment        = preSegment || {
       endPoint: {
         x: 0,
-        y: 0
-      }
+        y: 0,
+      },
     };
-    const relative = ARR_CMD.indexOf(command) >= 0; // /[a-z]/.test(command);
-    const cmd = relative ? command.toUpperCase() : command;
-    const p = item;
+    const relative    = ARR_CMD.indexOf(command) >= 0; // /[a-z]/.test(command);
+    const cmd         = relative ? command.toUpperCase() : command;
+    const p           = item;
     let point1;
     let point2;
     let point3;
@@ -111,18 +130,19 @@ Util.augment(PathSegment, {
     const p1 = p[1];
     const p2 = p[2];
     switch (cmd) {
-      default: break;
+      default:
+        break;
       case 'M':
         if (relative) {
           point = toAbsolute(p1, p2, preEndPoint);
         } else {
           point = {
             x: p1,
-            y: p2
+            y: p2,
           };
         }
-        this.command = 'M';
-        this.params = [ preEndPoint, point ];
+        this.command  = 'M';
+        this.params   = [preEndPoint, point];
         this.subStart = point;
         this.endPoint = point;
         break;
@@ -132,18 +152,18 @@ Util.augment(PathSegment, {
         } else {
           point = {
             x: p1,
-            y: p2
+            y: p2,
           };
         }
-        this.command = 'L';
-        this.params = [ preEndPoint, point ];
-        this.subStart = preSegment.subStart;
-        this.endPoint = point;
-        this.endTangent = function() {
-          return [ point.x - preEndPoint.x, point.y - preEndPoint.y ];
+        this.command      = 'L';
+        this.params       = [preEndPoint, point];
+        this.subStart     = preSegment.subStart;
+        this.endPoint     = point;
+        this.endTangent   = function() {
+          return [point.x - preEndPoint.x, point.y - preEndPoint.y];
         };
         this.startTangent = function() {
-          return [ preEndPoint.x - point.x, preEndPoint.y - point.y ];
+          return [preEndPoint.x - point.x, preEndPoint.y - point.y];
         };
         break;
       case 'H':
@@ -152,18 +172,18 @@ Util.augment(PathSegment, {
         } else {
           point = {
             x: p1,
-            y: preEndPoint.y
+            y: preEndPoint.y,
           };
         }
-        this.command = 'L';
-        this.params = [ preEndPoint, point ];
-        this.subStart = preSegment.subStart;
-        this.endPoint = point;
-        this.endTangent = function() {
-          return [ point.x - preEndPoint.x, point.y - preEndPoint.y ];
+        this.command      = 'L';
+        this.params       = [preEndPoint, point];
+        this.subStart     = preSegment.subStart;
+        this.endPoint     = point;
+        this.endTangent   = function() {
+          return [point.x - preEndPoint.x, point.y - preEndPoint.y];
         };
         this.startTangent = function() {
-          return [ preEndPoint.x - point.x, preEndPoint.y - point.y ];
+          return [preEndPoint.x - point.x, preEndPoint.y - point.y];
         };
         break;
       case 'V':
@@ -172,18 +192,18 @@ Util.augment(PathSegment, {
         } else {
           point = {
             x: preEndPoint.x,
-            y: p1
+            y: p1,
           };
         }
-        this.command = 'L';
-        this.params = [ preEndPoint, point ];
-        this.subStart = preSegment.subStart;
-        this.endPoint = point;
-        this.endTangent = function() {
-          return [ point.x - preEndPoint.x, point.y - preEndPoint.y ];
+        this.command      = 'L';
+        this.params       = [preEndPoint, point];
+        this.subStart     = preSegment.subStart;
+        this.endPoint     = point;
+        this.endTangent   = function() {
+          return [point.x - preEndPoint.x, point.y - preEndPoint.y];
         };
         this.startTangent = function() {
-          return [ preEndPoint.x - point.x, preEndPoint.y - point.y ];
+          return [preEndPoint.x - point.x, preEndPoint.y - point.y];
         };
         break;
       case 'Q':
@@ -193,22 +213,22 @@ Util.augment(PathSegment, {
         } else {
           point1 = {
             x: p1,
-            y: p2
+            y: p2,
           };
           point2 = {
             x: p[3],
-            y: p[4]
+            y: p[4],
           };
         }
-        this.command = 'Q';
-        this.params = [ preEndPoint, point1, point2 ];
-        this.subStart = preSegment.subStart;
-        this.endPoint = point2;
-        this.endTangent = function() {
-          return [ point2.x - point1.x, point2.y - point1.y ];
+        this.command      = 'Q';
+        this.params       = [preEndPoint, point1, point2];
+        this.subStart     = preSegment.subStart;
+        this.endPoint     = point2;
+        this.endTangent   = function() {
+          return [point2.x - point1.x, point2.y - point1.y];
         };
         this.startTangent = function() {
-          return [ preEndPoint.x - point1.x, preEndPoint.y - point1.y ];
+          return [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
         };
         break;
       case 'T':
@@ -217,31 +237,31 @@ Util.augment(PathSegment, {
         } else {
           point2 = {
             x: p1,
-            y: p2
+            y: p2,
           };
         }
         if (preSegment.command === 'Q') {
-          point1 = toSymmetry(preSegment.params[1], preEndPoint);
-          this.command = 'Q';
-          this.params = [ preEndPoint, point1, point2 ];
-          this.subStart = preSegment.subStart;
-          this.endPoint = point2;
-          this.endTangent = function() {
-            return [ point2.x - point1.x, point2.y - point1.y ];
+          point1            = toSymmetry(preSegment.params[1], preEndPoint);
+          this.command      = 'Q';
+          this.params       = [preEndPoint, point1, point2];
+          this.subStart     = preSegment.subStart;
+          this.endPoint     = point2;
+          this.endTangent   = function() {
+            return [point2.x - point1.x, point2.y - point1.y];
           };
           this.startTangent = function() {
-            return [ preEndPoint.x - point1.x, preEndPoint.y - point1.y ];
+            return [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
           };
         } else {
-          this.command = 'TL';
-          this.params = [ preEndPoint, point2 ];
-          this.subStart = preSegment.subStart;
-          this.endPoint = point2;
-          this.endTangent = function() {
-            return [ point2.x - preEndPoint.x, point2.y - preEndPoint.y ];
+          this.command      = 'TL';
+          this.params       = [preEndPoint, point2];
+          this.subStart     = preSegment.subStart;
+          this.endPoint     = point2;
+          this.endTangent   = function() {
+            return [point2.x - preEndPoint.x, point2.y - preEndPoint.y];
           };
           this.startTangent = function() {
-            return [ preEndPoint.x - point2.x, preEndPoint.y - point2.y ];
+            return [preEndPoint.x - point2.x, preEndPoint.y - point2.y];
           };
         }
 
@@ -254,26 +274,26 @@ Util.augment(PathSegment, {
         } else {
           point1 = {
             x: p1,
-            y: p2
+            y: p2,
           };
           point2 = {
             x: p[3],
-            y: p[4]
+            y: p[4],
           };
           point3 = {
             x: p[5],
-            y: p[6]
+            y: p[6],
           };
         }
-        this.command = 'C';
-        this.params = [ preEndPoint, point1, point2, point3 ];
-        this.subStart = preSegment.subStart;
-        this.endPoint = point3;
-        this.endTangent = function() {
-          return [ point3.x - point2.x, point3.y - point2.y ];
+        this.command      = 'C';
+        this.params       = [preEndPoint, point1, point2, point3];
+        this.subStart     = preSegment.subStart;
+        this.endPoint     = point3;
+        this.endTangent   = function() {
+          return [point3.x - point2.x, point3.y - point2.y];
         };
         this.startTangent = function() {
-          return [ preEndPoint.x - point1.x, preEndPoint.y - point1.y ];
+          return [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
         };
         break;
       case 'S':
@@ -283,79 +303,80 @@ Util.augment(PathSegment, {
         } else {
           point2 = {
             x: p1,
-            y: p2
+            y: p2,
           };
           point3 = {
             x: p[3],
-            y: p[4]
+            y: p[4],
           };
         }
         if (preSegment.command === 'C') {
-          point1 = toSymmetry(preSegment.params[2], preEndPoint);
-          this.command = 'C';
-          this.params = [ preEndPoint, point1, point2, point3 ];
-          this.subStart = preSegment.subStart;
-          this.endPoint = point3;
-          this.endTangent = function() {
-            return [ point3.x - point2.x, point3.y - point2.y ];
+          point1            = toSymmetry(preSegment.params[2], preEndPoint);
+          this.command      = 'C';
+          this.params       = [preEndPoint, point1, point2, point3];
+          this.subStart     = preSegment.subStart;
+          this.endPoint     = point3;
+          this.endTangent   = function() {
+            return [point3.x - point2.x, point3.y - point2.y];
           };
           this.startTangent = function() {
-            return [ preEndPoint.x - point1.x, preEndPoint.y - point1.y ];
+            return [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
           };
         } else {
-          this.command = 'SQ';
-          this.params = [ preEndPoint, point2, point3 ];
-          this.subStart = preSegment.subStart;
-          this.endPoint = point3;
-          this.endTangent = function() {
-            return [ point3.x - point2.x, point3.y - point2.y ];
+          this.command      = 'SQ';
+          this.params       = [preEndPoint, point2, point3];
+          this.subStart     = preSegment.subStart;
+          this.endPoint     = point3;
+          this.endTangent   = function() {
+            return [point3.x - point2.x, point3.y - point2.y];
           };
           this.startTangent = function() {
-            return [ preEndPoint.x - point2.x, preEndPoint.y - point2.y ];
+            return [preEndPoint.x - point2.x, preEndPoint.y - point2.y];
           };
         }
         break;
       case 'A': {
-        const rx = p1;
-        const ry = p2;
+        const rx  = p1;
+        const ry  = p2;
         const psi = p[3];
-        const fa = p[4];
-        const fs = p[5];
+        const fa  = p[4];
+        const fs  = p[5];
         if (relative) {
           point = toAbsolute(p[6], p[7], preEndPoint);
         } else {
           point = {
             x: p[6],
-            y: p[7]
+            y: p[7],
           };
         }
 
-        this.command = 'A';
-        this.params = getArcParams(preEndPoint, point, fa, fs, rx, ry, psi);
+        this.command  = 'A';
+        this.params   = getArcParams(preEndPoint, point, fa, fs, rx, ry, psi);
         this.subStart = preSegment.subStart;
         this.endPoint = point;
         break;
       }
       case 'Z': {
-        this.command = 'Z';
-        this.params = [ preEndPoint, preSegment.subStart ];
+        this.command  = 'Z';
+        this.params   = [preEndPoint, preSegment.subStart];
         this.subStart = preSegment.subStart;
         this.endPoint = preSegment.subStart;
       }
     }
-  },
-  isInside(x, y, lineWidth) {
-    const self = this;
-    const command = self.command;
-    const params = self.params;
-    const box = self.box;
+  }
+
+  public isInside(x, y, lineWidth) {
+    const command = this.command;
+    const params  = this.params;
+    const box     = this.box;
     if (box) {
       if (!Inside.box(box.minX, box.maxX, box.minY, box.maxY, x, y)) {
         return false;
       }
     }
     switch (command) {
-      default: break;
+      default:
+        break;
       case 'M':
         return false;
       case 'TL':
@@ -364,7 +385,7 @@ Util.augment(PathSegment, {
         return Inside.line(
           params[0].x, params[0].y,
           params[1].x, params[1].y,
-          lineWidth, x, y
+          lineWidth, x, y,
         );
       case 'SQ':
       case 'Q':
@@ -372,7 +393,7 @@ Util.augment(PathSegment, {
           params[0].x, params[0].y,
           params[1].x, params[1].y,
           params[2].x, params[2].y,
-          lineWidth, x, y
+          lineWidth, x, y,
         );
       case 'C': {
         return Inside.cubicline(
@@ -380,44 +401,46 @@ Util.augment(PathSegment, {
           params[1].x, params[1].y,
           params[2].x, params[2].y,
           params[3].x, params[3].y,
-          lineWidth, x, y
+          lineWidth, x, y,
         );
       }
       case 'A': {
-        let p = params;
-        const cx = p[1];
-        const cy = p[2];
-        const rx = p[3];
-        const ry = p[4];
-        const theta = p[5];
+        let p        = params;
+        const cx     = p[1];
+        const cy     = p[2];
+        const rx     = p[3];
+        const ry     = p[4];
+        const theta  = p[5];
         const dTheta = p[6];
-        const psi = p[7];
-        const fs = p[8];
+        const psi    = p[7];
+        const fs     = p[8];
 
-        const r = (rx > ry) ? rx : ry;
+        const r      = (rx > ry) ? rx : ry;
         const scaleX = (rx > ry) ? 1 : rx / ry;
         const scaleY = (rx > ry) ? ry / rx : 1;
 
-        p = [ x, y, 1 ];
-        const m = [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
-        mat3.translate(m, m, [ -cx, -cy ]);
+        p       = [x, y, 1];
+        const m = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+        mat3.translate(m, m, [-cx, -cy]);
         mat3.rotate(m, m, -psi);
-        mat3.scale(m, m, [ 1 / scaleX, 1 / scaleY ]);
+        mat3.scale(m, m, [1 / scaleX, 1 / scaleY]);
         vec3.transformMat3(p, p, m);
         return Inside.arcline(0, 0, r, theta, theta + dTheta, 1 - fs, lineWidth, p[0], p[1]);
       }
     }
     return false;
-  },
-  draw(context) {
+  }
+
+  public draw(context) {
     const command = this.command;
-    const params = this.params;
+    const params  = this.params;
     let point1;
     let point2;
     let point3;
 
     switch (command) {
-      default: break;
+      default:
+        break;
       case 'M':
         context.moveTo(params[1].x, params[1].y);
         break;
@@ -438,19 +461,19 @@ Util.augment(PathSegment, {
         context.bezierCurveTo(point1.x, point1.y, point2.x, point2.y, point3.x, point3.y);
         break;
       case 'A': {
-        const p = params;
-        const p1 = p[1];
-        const p2 = p[2];
-        const cx = p1;
-        const cy = p2;
-        const rx = p[3];
-        const ry = p[4];
-        const theta = p[5];
+        const p      = params;
+        const p1     = p[1];
+        const p2     = p[2];
+        const cx     = p1;
+        const cy     = p2;
+        const rx     = p[3];
+        const ry     = p[4];
+        const theta  = p[5];
         const dTheta = p[6];
-        const psi = p[7];
-        const fs = p[8];
+        const psi    = p[7];
+        const fs     = p[8];
 
-        const r = (rx > ry) ? rx : ry;
+        const r      = (rx > ry) ? rx : ry;
         const scaleX = (rx > ry) ? 1 : rx / ry;
         const scaleY = (rx > ry) ? ry / rx : 1;
 
@@ -467,10 +490,11 @@ Util.augment(PathSegment, {
         context.closePath();
         break;
     }
-  },
-  getBBox(lineWidth) {
+  }
+
+  public getBBox(lineWidth) {
     const halfWidth = lineWidth / 2;
-    const params = this.params;
+    const params    = this.params;
     let yDims;
     let xDims;
     let i;
@@ -487,7 +511,7 @@ Util.augment(PathSegment, {
           minX: Math.min(params[0].x, params[1].x) - halfWidth,
           maxX: Math.max(params[0].x, params[1].x) + halfWidth,
           minY: Math.min(params[0].y, params[1].y) - halfWidth,
-          maxY: Math.max(params[0].y, params[1].y) + halfWidth
+          maxY: Math.max(params[0].y, params[1].y) + halfWidth,
         };
         break;
       case 'SQ':
@@ -506,7 +530,7 @@ Util.augment(PathSegment, {
           minX: Math.min.apply(Math, xDims) - halfWidth,
           maxX: Math.max.apply(Math, xDims) + halfWidth,
           minY: Math.min.apply(Math, yDims) - halfWidth,
-          maxY: Math.max.apply(Math, yDims) + halfWidth
+          maxY: Math.max.apply(Math, yDims) + halfWidth,
         };
         break;
       case 'C':
@@ -524,27 +548,27 @@ Util.augment(PathSegment, {
           minX: Math.min.apply(Math, xDims) - halfWidth,
           maxX: Math.max.apply(Math, xDims) + halfWidth,
           minY: Math.min.apply(Math, yDims) - halfWidth,
-          maxY: Math.max.apply(Math, yDims) + halfWidth
+          maxY: Math.max.apply(Math, yDims) + halfWidth,
         };
         break;
       case 'A': {
         // todo 待优化
-        const p = params;
-        const cx = p[1];
-        const cy = p[2];
-        const rx = p[3];
-        const ry = p[4];
-        const theta = p[5];
+        const p      = params;
+        const cx     = p[1];
+        const cy     = p[2];
+        const rx     = p[3];
+        const ry     = p[4];
+        const theta  = p[5];
         const dTheta = p[6];
-        const psi = p[7];
-        const fs = p[8];
-        const start = theta;
-        const end = theta + dTheta;
+        const psi    = p[7];
+        const fs     = p[8];
+        const start  = theta;
+        const end    = theta + dTheta;
 
         const xDim = Ellipse.xExtrema(psi, rx, ry);
-        let minX = Infinity;
-        let maxX = -Infinity;
-        const xs = [ start, end ];
+        let minX   = Infinity;
+        let maxX   = -Infinity;
+        const xs   = [start, end];
         for (i = -Math.PI * 2; i <= Math.PI * 2; i += Math.PI) {
           const xAngle = xDim + i;
           if (fs === 1) {
@@ -569,9 +593,9 @@ Util.augment(PathSegment, {
         }
 
         const yDim = Ellipse.yExtrema(psi, rx, ry);
-        let minY = Infinity;
-        let maxY = -Infinity;
-        const ys = [ start, end ];
+        let minY   = Infinity;
+        let maxY   = -Infinity;
+        const ys   = [start, end];
         for (i = -Math.PI * 2; i <= Math.PI * 2; i += Math.PI) {
           const yAngle = yDim + i;
           if (fs === 1) {
@@ -598,12 +622,10 @@ Util.augment(PathSegment, {
           minX: minX - halfWidth,
           maxX: maxX + halfWidth,
           minY: minY - halfWidth,
-          maxY: maxY + halfWidth
+          maxY: maxY + halfWidth,
         };
         break;
       }
     }
   }
-});
-
-module.exports = PathSegment;
+}

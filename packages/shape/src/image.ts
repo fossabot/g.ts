@@ -1,78 +1,93 @@
-const Util = require('../util/index');
-const Shape = require('../core/shape');
-const Inside = require('./util/inside');
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
 
-const CImage = function(cfg) {
-  CImage.superclass.constructor.call(this, cfg);
-};
+const Util   = require('../util/index');
+import {Shape} from '@gradii/g/core';
 
-CImage.ATTRS = {
-  x: 0,
-  y: 0,
-  img: undefined,
-  width: 0,
-  height: 0,
-  sx: null,
-  sy: null,
-  swidth: null,
-  sheight: null
-};
+import Inside from './util/inside';
 
-Util.extend(CImage, Shape);
+export class CImage extends Shape {
+  public static ATTRS = {
+    x      : 0,
+    y      : 0,
+    img    : undefined,
+    width  : 0,
+    height : 0,
+    sx     : null,
+    sy     : null,
+    swidth : null,
+    sheight: null,
+  };
 
-Util.augment(CImage, {
-  type: 'image',
-  __afterSetAttrImg(img) {
+  constructor(cfg) {
+    super(cfg);
+  }
+
+  private type = 'image';
+
+  public __afterSetAttrImg(img) {
     this.__setAttrImg(img);
-  },
-  __afterSetAttrAll(params) {
+  }
+
+  public __afterSetAttrAll(params) {
     if (params.img) {
       this.__setAttrImg(params.img);
     }
-  },
-  isHitBox() {
+  }
+
+  public isHitBox() {
     return false;
-  },
-  calculateBox() {
-    const attrs = this.__attrs;
-    const x = attrs.x;
-    const y = attrs.y;
-    const width = attrs.width;
+  }
+
+  public calculateBox() {
+    const attrs  = this.__attrs;
+    const x      = attrs.x;
+    const y      = attrs.y;
+    const width  = attrs.width;
     const height = attrs.height;
 
     return {
       minX: x,
       minY: y,
       maxX: x + width,
-      maxY: y + height
+      maxY: y + height,
     };
-  },
-  isPointInPath(x, y) {
+  }
+
+  public isPointInPath(x, y) {
     const attrs = this.__attrs;
     if (this.get('toDraw') || !attrs.img) {
       return false;
     }
-    const rx = attrs.x;
-    const ry = attrs.y;
-    const width = attrs.width;
+    const rx     = attrs.x;
+    const ry     = attrs.y;
+    const width  = attrs.width;
     const height = attrs.height;
     return Inside.rect(rx, ry, width, height, x, y);
-  },
-  __setLoading(loading) {
+  }
+
+  public __setLoading(loading) {
     const canvas = this.get('canvas');
     if (loading === false && this.get('toDraw') === true) {
       this.__cfg.loading = false;
       canvas.draw();
     }
     return loading;
-  },
-  __setAttrImg(img) {
-    const self = this;
+  }
+
+  public __setAttrImg(img) {
+    const self  = this;
     const attrs = self.__attrs;
     if (Util.isString(img)) {
-      const image = new Image();
+      const image  = new Image();
       image.onload = function() {
-        if (self.get('destroyed')) return false;
+        if (self.get('destroyed')) { return false; }
         self.attr('imgSrc', img);
         self.attr('img', image);
         const callback = self.get('callback');
@@ -81,7 +96,7 @@ Util.augment(CImage, {
         }
         self.set('loading', false);
       };
-      image.src = img;
+      image.src    = img;
       self.set('loading', true);
     } else if (img instanceof Image) {
       if (!attrs.width) {
@@ -113,24 +128,26 @@ Util.augment(CImage, {
     } else {
       return null;
     }
-  },
-  drawInner(context) {
+  }
+
+  public drawInner(context) {
     if (this.get('loading')) {
       this.set('toDraw', true);
       return;
     }
     this.__drawImage(context);
-  },
-  __drawImage(context) {
-    const attrs = this.__attrs;
-    const x = attrs.x;
-    const y = attrs.y;
-    const img = attrs.img;
-    const width = attrs.width;
-    const height = attrs.height;
-    const sx = attrs.sx;
-    const sy = attrs.sy;
-    const swidth = attrs.swidth;
+  }
+
+  public __drawImage(context) {
+    const attrs   = this.__attrs;
+    const x       = attrs.x;
+    const y       = attrs.y;
+    const img     = attrs.img;
+    const width   = attrs.width;
+    const height  = attrs.height;
+    const sx      = attrs.sx;
+    const sy      = attrs.sy;
+    const swidth  = attrs.swidth;
     const sheight = attrs.sheight;
     this.set('toDraw', false);
 
@@ -159,6 +176,5 @@ Util.augment(CImage, {
     }
     return;
   }
-});
 
-module.exports = CImage;
+}

@@ -1,3 +1,12 @@
+/**
+ * @licence
+ * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
+ * Copyright (c) 2017-2018 Alipay inc.
+ *
+ * Use of this source code is governed by an MIT-style license.
+ * See LICENSE file in the project root for full license information.
+ */
+
 const Util = require('../util/index');
 const Shape = require('../core/shape');
 const Inside = require('./util/inside');
@@ -14,7 +23,7 @@ Quadratic.ATTRS = {
   p3: null, // 结束点
   lineWidth: 1,
   startArrow: false,
-  endArrow: false
+  endArrow: false,
 };
 
 Util.extend(Quadratic, Shape);
@@ -26,7 +35,7 @@ Util.augment(Quadratic, {
     return {
       lineWidth: 1,
       startArrow: false,
-      endArrow: false
+      endArrow: false,
     };
   },
   calculateBox() {
@@ -60,7 +69,7 @@ Util.augment(Quadratic, {
       minX: Math.min.apply(Math, xDims) - halfWidth,
       maxX: Math.max.apply(Math, xDims) + halfWidth,
       minY: Math.min.apply(Math, yDims) - halfWidth,
-      maxY: Math.max.apply(Math, yDims) + halfWidth
+      maxY: Math.max.apply(Math, yDims) + halfWidth,
     };
   },
   isPointInPath(x, y) {
@@ -73,7 +82,7 @@ Util.augment(Quadratic, {
       p1[0], p1[1],
       p2[0], p2[1],
       p3[0], p3[1],
-      lineWidth, x, y
+      lineWidth, x, y,
     );
   },
   createPath(context) {
@@ -100,9 +109,9 @@ Util.augment(Quadratic, {
     const attrs = this.__attrs;
     return {
       x: QuadraticMath.at(attrs.p1[0], attrs.p2[0], attrs.p3[0], t),
-      y: QuadraticMath.at(attrs.p1[1], attrs.p2[1], attrs.p3[1], t)
+      y: QuadraticMath.at(attrs.p1[1], attrs.p2[1], attrs.p3[1], t),
     };
-  }
+  },
 });
 
 module.exports = Quadratic;
