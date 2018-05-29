@@ -2,6 +2,17 @@
 # yarn lockfile v1
 
 
+"@antv/g@^2.0.7-beta.3":
+  version "2.0.7-beta.3"
+  resolved "http://registry.npm.alibaba-inc.com/@antv/g/download/@antv/g-2.0.7-beta.3.tgz#58a05647caf9719bd5c7ca77e5537313659f46ba"
+  dependencies:
+    d3-ease "~1.0.3"
+    d3-interpolate "~1.1.5"
+    d3-timer "~1.0.6"
+    gl-matrix "~2.3.2"
+    lodash "~4.17.4"
+    wolfy87-eventemitter "~5.1.0"
+
 abbrev@1:
   version "1.1.1"
   resolved "http://registry.npm.taobao.org/abbrev/download/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -966,6 +977,24 @@ custom-event@~1.0.0:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/custom-event/download/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
 
+d3-color@1:
+  version "1.2.0"
+  resolved "http://registry.npm.alibaba-inc.com/d3-color/download/d3-color-1.2.0.tgz#d1ea19db5859c86854586276ec892cf93148459a"
+
+d3-ease@~1.0.3:
+  version "1.0.3"
+  resolved "http://registry.npm.alibaba-inc.com/d3-ease/download/d3-ease-1.0.3.tgz#68bfbc349338a380c44d8acc4fbc3304aa2d8c0e"
+
+d3-interpolate@~1.1.5:
+  version "1.1.6"
+  resolved "http://registry.npm.alibaba-inc.com/d3-interpolate/download/d3-interpolate-1.1.6.tgz#2cf395ae2381804df08aa1bf766b7f97b5f68fb6"
+  dependencies:
+    d3-color "1"
+
+d3-timer@~1.0.6:
+  version "1.0.7"
+  resolved "http://registry.npm.alibaba-inc.com/d3-timer/download/d3-timer-1.0.7.tgz#df9650ca587f6c96607ff4e60cc38229e8dd8531"
+
 d@1:
   version "1.0.0"
   resolved "http://registry.npm.taobao.org/d/download/d-1.0.0.tgz#754bb5bfe55451da69a58b94d45f4c5b0462d58f"
@@ -1683,6 +1712,10 @@ getpass@^0.1.1:
   resolved "http://registry.npm.taobao.org/getpass/download/getpass-0.1.7.tgz#5eff8e3e684d569ae4cb2b1282604e8ba62149fa"
   dependencies:
     assert-plus "^1.0.0"
+
+gl-matrix@~2.3.2:
+  version "2.3.2"
+  resolved "http://registry.npm.alibaba-inc.com/gl-matrix/download/gl-matrix-2.3.2.tgz#aac808c74af7d5db05fe04cb60ca1a0fcb174d74"
 
 glob-base@^0.3.0:
   version "0.3.0"
@@ -4566,6 +4599,10 @@ window-size@0.1.0:
 with-callback@^1.0.2:
   version "1.0.2"
   resolved "http://registry.npm.taobao.org/with-callback/download/with-callback-1.0.2.tgz#a09629b9a920028d721404fb435bdcff5c91bc21"
+
+wolfy87-eventemitter@~5.1.0:
+  version "5.1.0"
+  resolved "http://registry.npm.alibaba-inc.com/wolfy87-eventemitter/download/wolfy87-eventemitter-5.1.0.tgz#35c1ac0dd1ac0c15e35d981508fc22084a13a011"
 
 wordwrap@0.0.2:
   version "0.0.2"

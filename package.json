@@ -10,6 +10,7 @@
   ],
   "private": true,
   "devDependencies": {
+    "@antv/g": "^2.0.7-beta.3",
     "chai": "~4.0.1",
     "event-simulate": "~1.0.0",
     "istanbul": "~0.4.5",
