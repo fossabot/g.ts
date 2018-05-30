@@ -12,7 +12,33 @@ import {Vector3} from './vector3';
 import {Vector4} from './vector4';
 
 export class Matrix4 {
+  public static readonly dimension = 4;
+
   private values = new Float32Array(16);
+
+  public get right() {
+    return new Vector3([
+      this.values[0],
+      this.values[4],
+      this.values[8],
+    ]);
+  }
+
+  public get up() {
+    return new Vector3([
+      this.values[1],
+      this.values[5],
+      this.values[9],
+    ]);
+  }
+
+  public get forward() {
+    return new Vector3([
+      this.values[2],
+      this.values[6],
+      this.values[10],
+    ]);
+  }
 
   constructor(values: number[] = null) {
     if (values) {
@@ -77,6 +103,60 @@ export class Matrix4 {
     ];
   }
 
+  public index(row: number, col: number) {
+    return (row * 4) + col;
+  }
+
+  public entry(row: number, col: number) {
+    // console.assert((row >= 0) && (row < Matrix4.dimension));
+    // console.assert((col >= 0) && (col < Matrix4.dimension));
+
+    return this.values[this.index(row, col)];
+  }
+
+  public setEntry(row: number, col: number, v: number) {
+    this.values[this.index(row, col)] = v;
+
+    return this;
+  }
+
+  public setValues(
+    arg0: number,
+    arg1: number,
+    arg2: number,
+    arg3: number,
+    arg4: number,
+    arg5: number,
+    arg6: number,
+    arg7: number,
+    arg8: number,
+    arg9: number,
+    arg10: number,
+    arg11: number,
+    arg12: number,
+    arg13: number,
+    arg14: number,
+    arg15: number) {
+    this.values[0]  = arg0;
+    this.values[1]  = arg1;
+    this.values[2]  = arg2;
+    this.values[3]  = arg3;
+    this.values[4]  = arg4;
+    this.values[5]  = arg5;
+    this.values[6]  = arg6;
+    this.values[7]  = arg7;
+    this.values[8]  = arg8;
+    this.values[9]  = arg9;
+    this.values[10] = arg10;
+    this.values[11] = arg11;
+    this.values[12] = arg12;
+    this.values[13] = arg13;
+    this.values[14] = arg14;
+    this.values[15] = arg15;
+
+    return this;
+  }
+
   public equals(matrix: Matrix4, threshold = EPSILON): boolean {
     for (let i = 0; i < 16; i++) {
       if (Math.abs(this.values[i] - matrix.at(i)) > threshold) {
@@ -88,10 +168,10 @@ export class Matrix4 {
   }
 
   public determinant(): number {
-    const a00                                                                      = this.values[0], a01 = this.values[1], a02 = this.values[2], a03    = this.values[3],
-          a10                                                                      = this.values[4], a11 = this.values[5], a12 = this.values[6], a13 = this.values[7],
-          a20                                                                      = this.values[8], a21 = this.values[9], a22 = this.values[10], a23   = this.values[11],
-          a30 = this.values[12], a31 = this.values[13], a32 = this.values[14], a33 = this.values[15];
+    const a00 = this.values[0], a01 = this.values[1], a02 = this.values[2], a03 = this.values[3];
+    const a10 = this.values[4], a11 = this.values[5], a12 = this.values[6], a13 = this.values[7];
+    const a20 = this.values[8], a21 = this.values[9], a22 = this.values[10], a23 = this.values[11];
+    const a30 = this.values[12], a31 = this.values[13], a32 = this.values[14], a33 = this.values[15];
 
     const det00 = a00 * a11 - a01 * a10,
           det01 = a00 * a12 - a02 * a10,
@@ -109,7 +189,7 @@ export class Matrix4 {
     return (det00 * det11 - det01 * det10 + det02 * det09 + det03 * det08 - det04 * det07 + det05 * det06);
   }
 
-  public identity(): Matrix4 {
+  public setIdentity(): Matrix4 {
     this.values[0]  = 1;
     this.values[1]  = 0;
     this.values[2]  = 0;
@@ -131,6 +211,7 @@ export class Matrix4 {
   }
 
   /**
+   * 转置矩阵
    * Transpose the values of a {@class Matrix4}
    *
    * @returns {Matrix4}
@@ -363,6 +444,10 @@ export class Matrix4 {
     return this;
   }
 
+  public multiplied(m: Matrix4) {
+    return this.clone().multiply(m);
+  }
+
   public multiplyVector3(vector: Vector3): Vector3 {
     const x = vector.x,
           y = vector.y,
@@ -479,7 +564,7 @@ export class Matrix4 {
     return this;
   }
 
-  public rotate(angle: number, axis: Vector3): Matrix4 {
+  public rotate(radians: number, axis: Vector3): Matrix4 {
     let x = axis.x;
     let y = axis.y;
     let z = axis.z;
@@ -497,8 +582,8 @@ export class Matrix4 {
       z *= length;
     }
 
-    const s = Math.sin(angle);
-    const c = Math.cos(angle);
+    const s = Math.sin(radians);
+    const c = Math.cos(radians);
 
     const t = 1.0 - c;
 
@@ -631,6 +716,84 @@ export class Matrix4 {
     this.values[6] = a12 * c - a02 * s;
     this.values[7] = a13 * c - a03 * s;
     return this;
+  }
+
+  /**
+   * TODO
+   * @param radians
+   */
+  public setRotationX(radians) {
+    const c = Math.cos(radians);
+    const s = Math.sin(radians);
+
+    this.values[0] = 1;
+    this.values[1] = 0;
+    this.values[2] = 0;
+
+    this.values[4] = 0;
+    this.values[5] = c;
+    this.values[6] = -s;
+
+    this.values[8]  = 0;
+    this.values[9]  = s;
+    this.values[10] = c;
+
+    this.values[12] = 0;
+    this.values[13] = 0;
+    this.values[14] = 0;
+
+    return this;
+  }
+
+  /**
+   * TODO
+   * @param radians
+   */
+  public setRotationY(radians) {
+    const c = Math.cos(radians);
+    const s = Math.sin(radians);
+
+    this.values[0] = c;
+    this.values[1] = 0;
+    this.values[2] = s;
+    this.values[3] = 0;
+
+    this.values[4] = 0;
+    this.values[5] = 1;
+    this.values[6] = 0;
+    this.values[7] = 0;
+
+    this.values[8]  = -s;
+    this.values[9]  = 0;
+    this.values[10] = c;
+    this.values[11] = 0;
+
+    return this;
+  }
+
+  /**
+   * TODO
+   * @param radians
+   */
+  public setRotationZ(radians) {
+    const c = Math.cos(radians);
+    const s = Math.sin(radians);
+
+    this.values[0] = c;
+    this.values[1] = -s;
+    this.values[2] = 0;
+
+    this.values[4] = s;
+    this.values[5] = c;
+    this.values[6] = 0;
+
+    this.values[8]  = 0;
+    this.values[9]  = 0;
+    this.values[10] = 1;
+
+    this.values[12] = 0;
+    this.values[13] = 0;
+    this.values[14] = 0;
   }
 
   /**
@@ -1399,7 +1562,7 @@ export class Matrix4 {
 
   public static lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): Matrix4 {
     if (position.equals(target)) {
-      return Matrix4.identity;
+      return new Matrix4().setIdentity();
     }
 
     const z = Vector3.difference(position, target).normalize();

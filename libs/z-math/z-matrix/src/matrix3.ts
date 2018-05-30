@@ -131,6 +131,8 @@ export class Matrix3 {
 
   public setEntry(row: number, col: number, v: number) {
     this.values[this.index(row, col)] = v;
+
+    return this;
   }
 
   public setValues(arg0: number, arg1: number, arg2: number,
@@ -145,6 +147,8 @@ export class Matrix3 {
     this.values[6] = arg6;
     this.values[7] = arg7;
     this.values[8] = arg8;
+
+    return this;
   }
 
   /**

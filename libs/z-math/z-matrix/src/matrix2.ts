@@ -93,6 +93,8 @@ export class Matrix2 {
 
   public setEntry(row: number, col: number, v: number) {
     this.values[this.index(row, col)] = v;
+
+    return this;
   }
 
   public setValues(arg0, arg1, arg2, arg3) {
@@ -100,6 +102,8 @@ export class Matrix2 {
     this.values[1] = arg1;
     this.values[2] = arg2;
     this.values[3] = arg3;
+
+    return this;
   }
 
   public equals(matrix: Matrix2, threshold = EPSILON): boolean {
