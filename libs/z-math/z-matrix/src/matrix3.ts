@@ -137,12 +137,24 @@ export class Matrix3 {
     );
   }
 
+  public setZero() {
+    this.values[0] = 0;
+    this.values[1] = 0;
+    this.values[2] = 0;
+    this.values[3] = 0;
+    this.values[4] = 0;
+    this.values[5] = 0;
+    this.values[6] = 0;
+    this.values[7] = 0;
+    this.values[8] = 0;
+  }
+
   /**
-   * Set a mat3 to the identity matrix
+   * Set a mat3 to the setIdentity matrix
    *
    * @returns {Matrix3}
    */
-  public identity(): Matrix3 {
+  public setIdentity(): Matrix3 {
     this.values[0] = 1;
     this.values[1] = 0;
     this.values[2] = 0;

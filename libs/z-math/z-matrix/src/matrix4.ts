@@ -812,7 +812,7 @@ export class Matrix4 {
    * This is equivalent to (but much faster than):
    *
    *     mat4
-   *     .identity()
+   *     .setIdentity()
    *     .translate(vec);
    *
    * @param {Vector3} v
@@ -844,7 +844,7 @@ export class Matrix4 {
    * This is equivalent to (but much faster than):
    *
    *     mat4
-   *     .identity()
+   *     .setIdentity()
    *     .scale(vec);
    *
    * @param {Vector3} v
@@ -876,7 +876,7 @@ export class Matrix4 {
    * This is equivalent to (but much faster than):
    *
    *     mat4
-   *     .identity()
+   *     .setIdentity()
    *     .rotate(rad, axis);
    *
    * @param {number} rad
@@ -932,7 +932,7 @@ export class Matrix4 {
    * This is equivalent to (but much faster than):
    *
    *     mat4
-   *     .identity()
+   *     .setIdentity()
    *     .rotateX(rad);
    *
    * @param {number} rad
@@ -969,7 +969,7 @@ export class Matrix4 {
    * This is equivalent to (but much faster than):
    *
    *     mat4
-   *     .identity()
+   *     .setIdentity()
    *     .rotateY(rad);
    *
    * @param {Number} rad the angle to rotate the matrix by
@@ -1006,7 +1006,7 @@ export class Matrix4 {
    * This is equivalent to (but much faster than):
    *
    *     mat4
-   *     .identity()
+   *     .setIdentity()
    *     .rotateZ(rad);
    *
    * @param {Number} rad the angle to rotate the matrix by
@@ -1043,7 +1043,7 @@ export class Matrix4 {
    * This is equivalent to (but much faster than):
    *
    *     mat4
-   *     .identity()
+   *     .setIdentity()
    *     .translate(vec);
    *
    *     var quatMat = mat4
@@ -1104,7 +1104,7 @@ export class Matrix4 {
    * Creates a matrix from a Quaternion rotation, vector translation and vector scale
    * This is equivalent to (but much faster than):
    *
-   *     mat4.identity(dest);
+   *     mat4.setIdentity(dest);
    *     mat4.translate(dest, vec);
    *     var quatMat = mat4.create();
    *     quat4.toMat4(quat, quatMat);
@@ -1168,7 +1168,7 @@ export class Matrix4 {
    * Creates a matrix from a Quaternion rotation, vector translation and vector scale, rotating and scaling around the given origin
    * This is equivalent to (but much faster than):
    *
-   *     mat4.identity(dest);
+   *     mat4.setIdentity(dest);
    *     mat4.translate(dest, vec);
    *     mat4.translate(dest, origin);
    *     var quatMat = mat4.create();

@@ -19,6 +19,8 @@ import {Vector2} from './vector2';
 export class Matrix2 {
   private values = new Float32Array(4);
 
+  public readonly dimension = 2;
+
   constructor(values: number[] = null) {
     if (values) {
       this.init(values);
@@ -83,7 +85,10 @@ export class Matrix2 {
   }
 
   public setValues(arg0, arg1, arg2, arg3) {
-
+    this.values[0] = arg0;
+    this.values[1] = arg1;
+    this.values[2] = arg2;
+    this.values[3] = arg3;
   }
 
   public equals(matrix: Matrix2, threshold = EPSILON): boolean {
@@ -100,7 +105,19 @@ export class Matrix2 {
     return this.values[0] * this.values[3] - this.values[2] * this.values[1];
   }
 
-  public identity(): Matrix2 {
+  public setZero() {
+    this.values[0] = 0;
+    this.values[1] = 0;
+    this.values[2] = 0;
+    this.values[3] = 0;
+  }
+
+  /**
+   * 单位矩阵
+   *
+   * @returns {Matrix2}
+   */
+  public setIdentity(): Matrix2 {
     this.values[0] = 1;
     this.values[1] = 0;
     this.values[2] = 0;
@@ -109,6 +126,11 @@ export class Matrix2 {
     return this;
   }
 
+  /**
+   * 转置当前矩阵
+   *
+   * @returns {Matrix2}
+   */
   public transpose(): Matrix2 {
     let temp = this.values[1];
 
@@ -118,6 +140,19 @@ export class Matrix2 {
     return this;
   }
 
+  /**
+   * 返回一个新的转置矩阵
+   *
+   * @returns {Matrix2}
+   */
+  public transposed(): Matrix2 {
+    return this.clone().transpose();
+  }
+
+  /**
+   * 计算矩阵的逆矩阵
+   * @returns {Matrix2}
+   */
   public inverse(): Matrix2 {
     let det = this.determinant();
 
@@ -135,28 +170,14 @@ export class Matrix2 {
     return this;
   }
 
-  public multiply(matrix: Matrix2): Matrix2 {
+  public rotate(radians: number): Matrix2 {
     let a11 = this.values[0],
         a12 = this.values[1],
         a21 = this.values[2],
         a22 = this.values[3];
 
-    this.values[0] = a11 * matrix.at(0) + a12 * matrix.at(2);
-    this.values[1] = a11 * matrix.at(1) + a12 * matrix.at(3);
-    this.values[2] = a21 * matrix.at(0) + a22 * matrix.at(2);
-    this.values[3] = a21 * matrix.at(1) + a22 * matrix.at(3);
-
-    return this;
-  }
-
-  public rotate(angle: number): Matrix2 {
-    let a11 = this.values[0],
-        a12 = this.values[1],
-        a21 = this.values[2],
-        a22 = this.values[3];
-
-    let sin = Math.sin(angle),
-        cos = Math.cos(angle);
+    let sin = Math.sin(radians),
+        cos = Math.cos(radians);
 
     this.values[0] = a11 * cos + a12 * sin;
     this.values[1] = a11 * -sin + a12 * cos;
@@ -166,26 +187,83 @@ export class Matrix2 {
     return this;
   }
 
-  public multiplyVector2(vector: Vector2, result: Vector2 = null): Vector2 {
+  public scale(scale: number): Matrix2 {
+    this.values[0] = this.values[0] * scale;
+    this.values[1] = this.values[1] * scale;
+    this.values[2] = this.values[2] * scale;
+    this.values[3] = this.values[3] * scale;
+
+    return this;
+  }
+
+  public scaled(scale: number): Matrix2 {
+    return this.clone().scale(scale);
+  }
+
+  public add(m: Matrix2) {
+    this.values[0] = this.values[0] + m.at(0);
+    this.values[1] = this.values[0] + m.at(1);
+    this.values[2] = this.values[0] + m.at(2);
+    this.values[3] = this.values[0] + m.at(3);
+
+    return this;
+  }
+
+  public sub(m: Matrix2) {
+    this.values[0] = this.values[0] - m.at(0);
+    this.values[1] = this.values[0] - m.at(1);
+    this.values[2] = this.values[0] - m.at(2);
+    this.values[3] = this.values[0] - m.at(3);
+
+    return this;
+  }
+
+  public multiply(m: Matrix2): Matrix2 {
+    const a11 = this.values[0],
+          a12 = this.values[1],
+          a21 = this.values[2],
+          a22 = this.values[3];
+
+    const b11 = m.at(0),
+          b12 = m.at(1),
+          b21 = m.at(2),
+          b22 = m.at(3);
+
+    this.values[0] = a11 * b11 + a12 * b21;
+    this.values[1] = a11 * b12 + a12 * b22;
+    this.values[2] = a21 * b11 + a22 * b21;
+    this.values[3] = a21 * b12 + a22 * b22;
+
+    return this;
+  }
+
+  public multiplied(m: Matrix2): Matrix2 {
+    return this.clone().multiply(m);
+  }
+
+  public transform(vector: Vector2): Vector2 {
     let x = vector.x,
         y = vector.y;
 
-    if (result) {
-      result.xy = [
-        x * this.values[0] + y * this.values[1],
-        x * this.values[2] + y * this.values[3],
-      ];
+    vector.xy = [
+      x * this.values[0] + y * this.values[1],
+      x * this.values[2] + y * this.values[3],
+    ];
 
-      return result;
-    } else {
-      return new Vector2([
-        x * this.values[0] + y * this.values[1],
-        x * this.values[2] + y * this.values[3],
-      ]);
-    }
+    return vector;
   }
 
-  public scale(vector: Vector2): Matrix2 {
+  public transformed(vector: Vector2, out?: Vector2): Vector2 {
+    if (!out) {
+      out = vector.clone();
+    } else {
+      vector.copy(out);
+    }
+
+    return this.transform(out);
+  }
+
+  public scaleVector2(vector: Vector2): Matrix2 {
     let a11 = this.values[0],
         a12 = this.values[1],
         a21 = this.values[2],
@@ -221,6 +299,19 @@ export class Matrix2 {
       a21 * m2.at(0) + a22 * m2.at(2),
       a21 * m2.at(1) + a22 * m2.at(3),
     ]);
+
+    return result;
+  }
+
+  public static absolute(m: Matrix2, result?: Matrix2) {
+    if (!result) {
+      result = new Matrix2();
+    }
+
+    result.values[0] = Math.abs(m.at(0));
+    result.values[1] = Math.abs(m.at(1));
+    result.values[2] = Math.abs(m.at(2));
+    result.values[3] = Math.abs(m.at(3));
 
     return result;
   }
