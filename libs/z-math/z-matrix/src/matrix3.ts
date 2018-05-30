@@ -6,7 +6,7 @@
  * See LICENSE file in the project root for full license information.
  */
 
-import {equals} from "./common";
+import {equals} from './common';
 import {Matrix4} from './matrix4';
 import {Quaternion} from './quaternion';
 import {Vector2} from './vector2';
@@ -16,6 +16,38 @@ export class Matrix3 {
   public static readonly dimension = 3;
 
   private values = new Float32Array(9);
+
+  /**
+   * TODO
+   * @returns {Vector3}
+   */
+  public get right() {
+    return new Vector3([
+      this.values[0],
+      this.values[3],
+      this.values[6],
+    ]);
+  }
+
+  /**
+   * TODO
+   * @returns {Vector3}
+   */
+  public get up() {
+    return new Vector3([
+      this.values[1],
+      this.values[4],
+      this.values[7],
+    ]);
+  }
+
+  public get forward() {
+    return new Vector3([
+      this.values[2],
+      this.values[5],
+      this.values[8],
+    ]);
+  }
 
   constructor(values: number[] = null) {
     if (values) {
@@ -356,6 +388,16 @@ export class Matrix3 {
     return v;
   }
 
+  public transformed(vector: Vector3, out?: Vector3) {
+    if (!out) {
+      out = vector.clone();
+    } else {
+      vector.copy(out);
+    }
+
+    return this.transformVector3(out);
+  }
+
   public scale(scale: number) {
     this.values[0] = this.values[0] * scale;
     this.values[1] = this.values[1] * scale;
@@ -429,8 +471,6 @@ export class Matrix3 {
   public multiplied(m: Matrix3) {
     return this.clone().multiply(m);
   }
-
-  //TODO 2018年5月30日19:59:43
 
   public toMatrix4(result?: Matrix4): Matrix4 {
     if (!result) {
@@ -735,6 +775,5 @@ export class Matrix3 {
 
     return out;
   }
-
 
 }

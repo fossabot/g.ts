@@ -249,6 +249,10 @@ export class Vector3 {
     return dest;
   }
 
+  public clone() {
+    return this.copy();
+  }
+
   public static cross(vector: Vector3, vector2: Vector3, dest: Vector3 = null): Vector3 {
     if (!dest) {
       dest = new Vector3();
