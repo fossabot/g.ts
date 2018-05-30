@@ -30,3 +30,8 @@ status marker `✔` `✘`
 | Vector2 |   ✘    |             |      |
 | Vector3 |   ✘    |             |      |
 
+
+
+### reference
+
+[euclideanspace](https://www.euclideanspace.com/maths/algebra/index.htm)
