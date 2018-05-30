@@ -116,7 +116,7 @@ describe('Vector3', () => {
 
     describe('transformMat4', () => {
         let matr: number[];
-        describe('with an identity', () => {
+        describe('with an setIdentity', () => {
             beforeEach(() => {
                 matr = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
             });
@@ -174,7 +174,7 @@ describe('Vector3', () => {
 
     describe('transformMat3', () => {
         let matr: number[];
-        describe('with an identity', () => {
+        describe('with an setIdentity', () => {
             beforeEach(() => {
                 matr = [1, 0, 0, 0, 1, 0, 0, 0, 1];
             });

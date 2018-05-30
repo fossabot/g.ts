@@ -6,12 +6,15 @@
  * See LICENSE file in the project root for full license information.
  */
 
+import {equals} from "./common";
 import {Matrix4} from './matrix4';
 import {Quaternion} from './quaternion';
 import {Vector2} from './vector2';
 import {Vector3} from './vector3';
 
 export class Matrix3 {
+  public static readonly dimension = 3;
+
   private values = new Float32Array(9);
 
   constructor(values: number[] = null) {
@@ -83,6 +86,35 @@ export class Matrix3 {
     ];
   }
 
+  public index(row: number, col: number) {
+    return row * 3 + col;
+  }
+
+  public entry(row: number, col: number) {
+    // console.assert((row >= 0) && (row < Matrix3.dimension));
+    // console.assert((col >= 0) && (col < Matrix3.dimension));
+
+    return this.values[this.index(row, col)];
+  }
+
+  public setEntry(row: number, col: number, v: number) {
+    this.values[this.index(row, col)] = v;
+  }
+
+  public setValues(arg0: number, arg1: number, arg2: number,
+                   arg3: number, arg4: number, arg5: number,
+                   arg6: number, arg7: number, arg8: number) {
+    this.values[0] = arg0;
+    this.values[1] = arg1;
+    this.values[2] = arg2;
+    this.values[3] = arg3;
+    this.values[4] = arg4;
+    this.values[5] = arg5;
+    this.values[6] = arg6;
+    this.values[7] = arg7;
+    this.values[8] = arg8;
+  }
+
   /**
    * Returns whether or not the matrices have exactly the same elements in the same position (when compared with ===)
    *
@@ -112,8 +144,7 @@ export class Matrix3 {
    */
   public equals(matrix: Matrix3, threshold = EPSILON): boolean {
     for (let i = 0; i < 9; i++) {
-      if (Math.abs(this.values[i] - matrix.at(i)) >
-        threshold * Math.max(1.0, Math.abs(this.values[i]), Math.abs(matrix.at(i)))) {
+      if (!equals(this.values[i], matrix.at(i))) {
         return false;
       }
     }
@@ -188,6 +219,10 @@ export class Matrix3 {
     return this;
   }
 
+  public transposed(): Matrix3 {
+    return this.clone().transpose();
+  }
+
   /**
    * Inverts a {@class Matrix3}
    * @returns {Matrix3}
@@ -222,21 +257,57 @@ export class Matrix3 {
     return this;
   }
 
+  public setRotationX(radians: number) {
+    const c        = Math.cos(radians);
+    const s        = Math.sin(radians);
+    this.values[0] = 1;
+    this.values[1] = 0;
+    this.values[2] = 0;
+    this.values[3] = 0;
+    this.values[4] = c;
+    this.values[5] = -s;
+    this.values[6] = 0;
+    this.values[7] = s;
+    this.values[8] = c;
+  }
+
+  public setRotationY(radians: number) {
+    const c        = Math.cos(radians);
+    const s        = Math.sin(radians);
+    this.values[0] = c;
+    this.values[1] = 0;
+    this.values[2] = -s;
+    this.values[3] = 0;
+    this.values[4] = 1;
+    this.values[5] = 0;
+    this.values[6] = s;
+    this.values[7] = 0;
+    this.values[8] = c;
+  }
+
+  public setRotationZ(radians: number) {
+    const c        = Math.cos(radians);
+    const s        = Math.sin(radians);
+    this.values[0] = c;
+    this.values[1] = -s;
+    this.values[2] = 0;
+    this.values[3] = s;
+    this.values[4] = c;
+    this.values[5] = 0;
+    this.values[6] = 0;
+    this.values[7] = 0;
+    this.values[8] = 1;
+  }
+
   /**
    * Calculates the adjugate of {@class Matrix3}
    *
    * @returns {Matrix3}
    */
   public adjoint() {
-    const a00 = this.values[0];
-    const a01 = this.values[1];
-    const a02 = this.values[2];
-    const a10 = this.values[3];
-    const a11 = this.values[4];
-    const a12 = this.values[5];
-    const a20 = this.values[6];
-    const a21 = this.values[7];
-    const a22 = this.values[8];
+    const a00 = this.values[0], a01 = this.values[1], a02 = this.values[2];
+    const a10 = this.values[3], a11 = this.values[4], a12 = this.values[5];
+    const a20 = this.values[6], a21 = this.values[7], a22 = this.values[8];
 
     this.values[0] = a11 * a22 - a12 * a21;
     this.values[1] = a02 * a21 - a01 * a22;
@@ -247,6 +318,87 @@ export class Matrix3 {
     this.values[6] = a10 * a21 - a11 * a20;
     this.values[7] = a01 * a20 - a00 * a21;
     this.values[8] = a00 * a11 - a01 * a10;
+    return this;
+  }
+
+  public rotateVector3(v: Vector3) {
+    v.xyz = [
+      v.x * this.values[0] + v.y * this.values[1] + v.z * this.values[2],
+      v.x * this.values[3] + v.y * this.values[4] + v.z * this.values[5],
+      v.x * this.values[6] + v.y * this.values[7] + v.z * this.values[8],
+    ];
+    return v;
+  }
+
+  public rotateVector2(v: Vector2) {
+    v.xy = [
+      v.x * this.values[0] + v.y * this.values[1],
+      v.x * this.values[3] + v.y * this.values[4],
+    ];
+    return v;
+  }
+
+  public transformVector2(v: Vector2) {
+    v.xy = [
+      v.x * this.values[0] + v.y * this.values[1] + this.values[2],
+      v.x * this.values[3] + v.y * this.values[4] + this.values[5],
+    ];
+    return v;
+  }
+
+  public transformVector3(v: Vector3) {
+    v.xyz = [
+      v.x + this.values[0] + v.y * this.values[1] + this.values[2],
+      v.x + this.values[3] + v.y * this.values[4] + this.values[5],
+      v.x + this.values[6] + v.y * this.values[7] + this.values[8],
+    ];
+
+    return v;
+  }
+
+  public scale(scale: number) {
+    this.values[0] = this.values[0] * scale;
+    this.values[1] = this.values[1] * scale;
+    this.values[2] = this.values[2] * scale;
+    this.values[3] = this.values[3] * scale;
+    this.values[4] = this.values[4] * scale;
+    this.values[5] = this.values[5] * scale;
+    this.values[6] = this.values[6] * scale;
+    this.values[7] = this.values[7] * scale;
+    this.values[8] = this.values[8] * scale;
+
+    return this;
+  }
+
+  public scaled(scale: number) {
+    return this.clone().scale(scale);
+  }
+
+  public add(m: Matrix3) {
+    this.values[0] = this.values[0] + m.at(0);
+    this.values[1] = this.values[1] + m.at(1);
+    this.values[2] = this.values[2] + m.at(2);
+    this.values[3] = this.values[3] + m.at(3);
+    this.values[4] = this.values[4] + m.at(4);
+    this.values[5] = this.values[5] + m.at(5);
+    this.values[6] = this.values[6] + m.at(6);
+    this.values[7] = this.values[7] + m.at(7);
+    this.values[8] = this.values[8] + m.at(8);
+
+    return this;
+  }
+
+  public sub(m: Matrix3) {
+    this.values[0] = this.values[0] - m.at(0);
+    this.values[1] = this.values[1] - m.at(1);
+    this.values[2] = this.values[2] - m.at(2);
+    this.values[3] = this.values[3] - m.at(3);
+    this.values[4] = this.values[4] - m.at(4);
+    this.values[5] = this.values[5] - m.at(5);
+    this.values[6] = this.values[6] - m.at(6);
+    this.values[7] = this.values[7] - m.at(7);
+    this.values[8] = this.values[8] - m.at(8);
+
     return this;
   }
 
@@ -273,6 +425,12 @@ export class Matrix3 {
 
     return this;
   }
+
+  public multiplied(m: Matrix3) {
+    return this.clone().multiply(m);
+  }
+
+  //TODO 2018年5月30日19:59:43
 
   public toMatrix4(result?: Matrix4): Matrix4 {
     if (!result) {
@@ -415,40 +573,40 @@ export class Matrix3 {
     return this;
   }
 
-  /**
-   * Rotates a {@class Matrix3} by the given angle
-   *
-   * @param {number} rad the angle to rotate the matrix by
-   * @returns {this}
-   */
-  public rotate(rad: number) {
-    const a00 = this.values[0];
-    const a01 = this.values[1];
-    const a02 = this.values[2];
-    const a10 = this.values[3];
-    const a11 = this.values[4];
-    const a12 = this.values[5];
-    const a20 = this.values[6];
-    const a21 = this.values[7];
-    const a22 = this.values[8];
-    const s   = Math.sin(rad);
-    const c   = Math.cos(rad);
+  // /**
+  //  * Rotates a {@class Matrix3} by the given angle
+  //  *
+  //  * @param {number} radians the angle to rotate the matrix by
+  //  * @returns {this}
+  //  */
+  // public rotate(radians: number) {
+  //   const a00 = this.values[0];
+  //   const a01 = this.values[1];
+  //   const a02 = this.values[2];
+  //   const a10 = this.values[3];
+  //   const a11 = this.values[4];
+  //   const a12 = this.values[5];
+  //   const a20 = this.values[6];
+  //   const a21 = this.values[7];
+  //   const a22 = this.values[8];
+  //   const s   = Math.sin(radians);
+  //   const c   = Math.cos(radians);
+  //
+  //   this.values[0] = c * a00 + s * a10;
+  //   this.values[1] = c * a01 + s * a11;
+  //   this.values[2] = c * a02 + s * a12;
+  //
+  //   this.values[3] = c * a10 - s * a00;
+  //   this.values[4] = c * a11 - s * a01;
+  //   this.values[5] = c * a12 - s * a02;
+  //
+  //   this.values[6] = a20;
+  //   this.values[7] = a21;
+  //   this.values[8] = a22;
+  //   return this;
+  // }
 
-    this.values[0] = c * a00 + s * a10;
-    this.values[1] = c * a01 + s * a11;
-    this.values[2] = c * a02 + s * a12;
-
-    this.values[3] = c * a10 - s * a00;
-    this.values[4] = c * a11 - s * a01;
-    this.values[5] = c * a12 - s * a02;
-
-    this.values[6] = a20;
-    this.values[7] = a21;
-    this.values[8] = a22;
-    return this;
-  }
-
-  public scale(v: Vector2) {
+  public scaleVector2(v: Vector2) {
     const x = v[0];
     const y = v[1];
 
@@ -559,5 +717,24 @@ export class Matrix3 {
       ]);
     }
   }
+
+  public static absolute(m: Matrix3, out?: Matrix3) {
+    if (!out) {
+      out = new Matrix3();
+    }
+
+    out.values[0] = Math.abs(m.at(0));
+    out.values[1] = Math.abs(m.at(1));
+    out.values[2] = Math.abs(m.at(2));
+    out.values[3] = Math.abs(m.at(3));
+    out.values[4] = Math.abs(m.at(4));
+    out.values[5] = Math.abs(m.at(5));
+    out.values[6] = Math.abs(m.at(6));
+    out.values[7] = Math.abs(m.at(7));
+    out.values[8] = Math.abs(m.at(8));
+
+    return out;
+  }
+
 
 }

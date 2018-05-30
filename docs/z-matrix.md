@@ -16,3 +16,17 @@ Conclusion:
 - lack of some api
 - because gl-matrix is pure function. so some of api should convert to class or static. 
 it is hard to choice which api should be non static or static. `NEVER MIND`
+
+
+### Schedule Board
+
+status marker `✔` `✘`
+
+|  Class  | Status | Description |      |
+| :-----: | :----: | :---------: | ---- |
+| Matrix2 |   ✔    |             |      |
+| Matrix3 |   ✘    |             |      |
+| Matrix4 |   ✘    |             |      |
+| Vector2 |   ✘    |             |      |
+| Vector3 |   ✘    |             |      |
+

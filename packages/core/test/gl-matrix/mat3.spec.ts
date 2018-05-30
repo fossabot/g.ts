@@ -164,7 +164,7 @@ describe('mat3', () => {
         beforeEach(() => {
             result = mat3.create();
         });
-        it('should return a 9 element array initialized to a 3x3 identity matrix', () => {
+        it('should return a 9 element array initialized to a 3x3 setIdentity matrix', () => {
             expect(result).toBeEqualish(identity);
         });
     });
@@ -192,7 +192,7 @@ describe('mat3', () => {
 
     describe('identity', () => {
         beforeEach(() => {
-            result = mat3.identity(out);
+            result = mat3.setIdentity(out);
         });
         it('should place values into out', () => {
             expect(result).toBeEqualish(identity);

@@ -317,7 +317,7 @@ describe('quat', () => {
                 expect(result).toBe(out);
             });
 
-            it('should produce identity', () => {
+            it('should produce setIdentity', () => {
                 expect(out).toBeEqualish([0, 0, 0, 1]);
             });
         });
@@ -436,7 +436,7 @@ describe('quat', () => {
         beforeEach(() => {
             result = quat.create();
         });
-        it('should return a 4 element array initialized to an identity Quaternion', () => {
+        it('should return a 4 element array initialized to an setIdentity Quaternion', () => {
             expect(result).toBeEqualish([0, 0, 0, 1]);
         });
     });
@@ -485,7 +485,7 @@ describe('quat', () => {
 
     describe('identity', () => {
         beforeEach(() => {
-            result = quat.identity(out);
+            result = quat.setIdentity(out);
         });
         it('should place values into out', () => {
             expect(result).toBeEqualish([0, 0, 0, 1]);

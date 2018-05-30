@@ -9,7 +9,7 @@
 import {Vector2} from './vector2';
 
 /**
- * use row-major, because such as matrix can represent as
+ * use row-major, because such matrix can represent as
  * ```
  *  [[1, 0, 0],
  *   [0, 1, 0],
@@ -17,9 +17,9 @@ import {Vector2} from './vector2';
  * ```
  */
 export class Matrix2 {
-  private values = new Float32Array(4);
+  public static readonly dimension = 2;
 
-  public readonly dimension = 2;
+  private values = new Float32Array(4);
 
   constructor(values: number[] = null) {
     if (values) {
@@ -82,6 +82,17 @@ export class Matrix2 {
 
   public index(row: number, col: number) {
     return (row * 2) + col;
+  }
+
+  public entry(row: number, col: number) {
+    // console.assert((row >= 0) && (row < Matrix3.dimension));
+    // console.assert((col >= 0) && (col < Matrix3.dimension));
+
+    return this.values[this.index(row, col)];
+  }
+
+  public setEntry(row: number, col: number, v: number) {
+    this.values[this.index(row, col)] = v;
   }
 
   public setValues(arg0, arg1, arg2, arg3) {
@@ -168,6 +179,15 @@ export class Matrix2 {
     this.values[3] = det * (this.values[0]);
 
     return this;
+  }
+
+  public setRotation(radians: number) {
+    const c = Math.cos(radians);
+    const s = Math.sin(radians);
+    this.values[0] = c;
+    this.values[1] = -s;
+    this.values[2] = s;
+    this.values[3] = c;
   }
 
   public rotate(radians: number): Matrix2 {
@@ -303,17 +323,17 @@ export class Matrix2 {
     return result;
   }
 
-  public static absolute(m: Matrix2, result?: Matrix2) {
-    if (!result) {
-      result = new Matrix2();
+  public static absolute(m: Matrix2, out?: Matrix2) {
+    if (!out) {
+      out = new Matrix2();
     }
 
-    result.values[0] = Math.abs(m.at(0));
-    result.values[1] = Math.abs(m.at(1));
-    result.values[2] = Math.abs(m.at(2));
-    result.values[3] = Math.abs(m.at(3));
+    out.values[0] = Math.abs(m.at(0));
+    out.values[1] = Math.abs(m.at(1));
+    out.values[2] = Math.abs(m.at(2));
+    out.values[3] = Math.abs(m.at(3));
 
-    return result;
+    return out;
   }
 
 }

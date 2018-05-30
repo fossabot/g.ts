@@ -121,7 +121,7 @@ function buildMat4Tests() {
             beforeEach(() => {
                 result = mat4.create();
             });
-            it('should return a 16 element array initialized to a 4x4 identity matrix', () => {
+            it('should return a 16 element array initialized to a 4x4 setIdentity matrix', () => {
                 expect(result).toBeEqualish(identity);
             });
         });
@@ -149,7 +149,7 @@ function buildMat4Tests() {
 
         describe('identity', () => {
             beforeEach(() => {
-                result = mat4.identity(out);
+                result = mat4.setIdentity(out);
             });
             it('should place values into out', () => {
                 expect(result).toBeEqualish(identity);
@@ -1095,7 +1095,7 @@ function buildMat4Tests() {
         // TODO: fromRotationTranslation
 
         describe('getTranslation', () => {
-            describe('from the identity matrix', () => {
+            describe('from the setIdentity matrix', () => {
                 beforeEach(() => {
                     result = vec3.fromValues(1, 2, 3);
                     out = vec3.fromValues(1, 2, 3);
@@ -1141,7 +1141,7 @@ function buildMat4Tests() {
         });
 
         describe('getScaling', () => {
-            describe('from the identity matrix', () => {
+            describe('from the setIdentity matrix', () => {
                 beforeEach(() => {
                     result = vec3.fromValues(1, 2, 3);
                     out = vec3.fromValues(1, 2, 3);
@@ -1150,7 +1150,7 @@ function buildMat4Tests() {
                 it('should place result both in result and out', () => {
                     expect(result).toBe(out);
                 });
-                it('should return the identity vector', () => {
+                it('should return the setIdentity vector', () => {
                     expect(result).toBeEqualish([1, 1, 1]);
                 });
             });
@@ -1178,7 +1178,7 @@ function buildMat4Tests() {
                     result = vec3.fromValues(1, 2, 3);
                     mat4.getScaling(result, out);
                 });
-                it('should return the identity vector', () => {
+                it('should return the setIdentity vector', () => {
                     expect(result).toBeEqualish([1, 1, 1]);
                 });
             });
@@ -1200,7 +1200,7 @@ function buildMat4Tests() {
         });
 
         describe('getRotation', () => {
-            describe('from the identity matrix', () => {
+            describe('from the setIdentity matrix', () => {
                 beforeEach(() => {
                     result = quat.fromValues(1, 2, 3, 4);
                     out = quat.fromValues(1, 2, 3, 4);
@@ -1211,7 +1211,7 @@ function buildMat4Tests() {
                 });
                 it('should return the unit Quaternion', () => {
                     const unitQuat = quat.create();
-                    quat.identity(unitQuat);
+                    quat.setIdentity(unitQuat);
                     expect(result).toBeEqualish(unitQuat);
                 });
             });
@@ -1224,7 +1224,7 @@ function buildMat4Tests() {
                 });
                 it('should return the unit Quaternion', () => {
                     const unitQuat = quat.create();
-                    quat.identity(unitQuat);
+                    quat.setIdentity(unitQuat);
                     expect(result).toBeEqualish(unitQuat);
                 });
             });
