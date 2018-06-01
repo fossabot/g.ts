@@ -258,9 +258,7 @@ export class Path extends Shape {
     for (let i = 0; i < segmentsLen; i++) {
       segments[i].draw(context);
     }
-  }
 
-  public afterPath(context) {
     const self = this;
     const attrs = self.__attrs;
     const segments = self.get('segments');
@@ -297,6 +295,7 @@ export class Path extends Shape {
         Arrow.addEndArrow(context, attrs, endPoint.x - v[0], endPoint.y - v[1], endPoint.x, endPoint.y, tangent());
       } else {
         Arrow.addEndArrow(context, attrs, startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+      }
       }
     }
   }

@@ -62,9 +62,7 @@ export class Line extends Shape {
     context.beginPath();
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
-  }
 
-  public afterPath(context) {
     const attrs = this.__attrs;
     const { x1, y1, x2, y2 } = attrs;
     context = context || this.get('context');
@@ -73,6 +71,7 @@ export class Line extends Shape {
     }
     if (attrs.endArrow) {
       Arrow.addEndArrow(context, attrs, x1, y1, x2, y2);
+    }
     }
   }
 

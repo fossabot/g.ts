@@ -60,7 +60,7 @@ function _addArrow(ctx, attrs, x1, y1, x2, y2) {
 }
 
 function _addMarker(ctx, attrs, x1, y1, x2, y2, shape) {
-  // const shape   = arrow.shape;
+  const shape = arrow.shape;
   const marker  = shape.__attrs;
   let method    = marker.symbol;
   const markerX = marker.x || x2;

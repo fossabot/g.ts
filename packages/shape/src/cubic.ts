@@ -102,9 +102,7 @@ export class Cubic extends Shape {
     context.beginPath();
     context.moveTo(p1[0], p1[1]);
     context.bezierCurveTo(p2[0], p2[1], p3[0], p3[1], p4[0], p4[1]);
-  }
 
-  public afterPath(context) {
     const attrs = this.__attrs;
     const { p1, p2, p3, p4 } = attrs;
     context = context || this.get('context');
@@ -113,6 +111,7 @@ export class Cubic extends Shape {
     }
     if (attrs.endArrow) {
       Arrow.addEndArrow(context, attrs, p3[0], p3[1], p4[0], p4[1]);
+    }
     }
   }
 

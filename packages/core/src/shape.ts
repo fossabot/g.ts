@@ -51,7 +51,6 @@ export class Shape extends Element {
         context.stroke();
       }
     }
-    this.afterPath(context);
   }
 
   /**

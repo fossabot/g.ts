@@ -145,9 +145,7 @@ export class Polyline extends Shape {
     }
     context.lineTo(points[l][0], points[l][1]);
 
-  }
 
-  public afterPath(context) {
     const self = this;
     const attrs = self.__attrs;
     const points = attrs.points;
@@ -159,6 +157,7 @@ export class Polyline extends Shape {
     }
     if (attrs.endArrow) {
       Arrow.addEndArrow(context, attrs, points[l - 1][0], points[l - 1][1], points[l][0], points[l][1]);
+    }
     }
   }
 
