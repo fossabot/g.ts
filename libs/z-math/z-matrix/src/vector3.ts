@@ -208,12 +208,12 @@ export class Vector3 {
     return dest;
   }
 
-  public multiplyByMat3(matrix: Matrix3, dest: Vector3 = null): Vector3 {
-    if (!dest) {
-      dest = this;
+  public multiplyByMat3(matrix: Matrix3, out: Vector3 = null): Vector3 {
+    if (!out) {
+      this.copy(out);
     }
 
-    return matrix.multiplyVector3(this, dest);
+    return matrix.transformVector3(out);
   }
 
   public multiplyByQuaternion(quat: Quaternion, dest: Vector3 = null): Vector3 {
