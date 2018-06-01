@@ -216,10 +216,10 @@ export class Vector2 {
 
   public multiplyMatrix2(matrix: Matrix2, out: Vector2 = null): Vector2 {
     if (!out) {
-      out = this;
+      this.copy(out);
     }
 
-    return matrix.multiplyVector2(this, out);
+    return matrix.transform(out);
   }
 
   public vertical(flag, out?: Vector2) {

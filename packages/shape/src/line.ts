@@ -56,15 +56,24 @@ export class Line extends Shape {
   }
 
   public createPath(context) {
-    const attrs            = this.__attrs;
-    const {x1, y1, x2, y2} = attrs;
-    context                = context || this.get('context');
+    const attrs = this.__attrs;
+    const { x1, y1, x2, y2 } = attrs;
+    context = context || self.get('context');
     context.beginPath();
-
-    Arrow.addStartArrow(context, attrs, x2, y2, x1, y1);
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
-    Arrow.addEndArrow(context, attrs, x1, y1, x2, y2);
+  }
+
+  public afterPath(context) {
+    const attrs = this.__attrs;
+    const { x1, y1, x2, y2 } = attrs;
+    context = context || this.get('context');
+    if (attrs.startArrow) {
+      Arrow.addStartArrow(context, attrs, x2, y2, x1, y1);
+    }
+    if (attrs.endArrow) {
+      Arrow.addEndArrow(context, attrs, x1, y1, x2, y2);
+    }
   }
 
   public getPoint(t) {

@@ -317,12 +317,12 @@ export class Vector4 {
     return dest;
   }
 
-  public multiplyMat4(matrix: Matrix4, dest: Vector4 = null): Vector4 {
-    if (!dest) {
-      dest = this;
+  public multiplyMat4(matrix: Matrix4, out: Vector4 = null): Vector4 {
+    if (!out) {
+      this.copy(out);
     }
 
-    return matrix.multiplyVec4(this, dest);
+    return matrix.transform(out);
   }
 
   public static mix(vector: Vector4, vector2: Vector4, time: number, dest: Vector4 = null): Vector4 {

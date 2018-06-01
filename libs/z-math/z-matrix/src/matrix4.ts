@@ -478,6 +478,18 @@ export class Matrix4 {
     return dest;
   }
 
+  public transform() {
+
+  }
+
+  public transform2() {
+
+  }
+
+  public transform3() {
+
+  }
+
   public toMatrix3(): Matrix3 {
     return new Matrix3([
       this.values[0],

@@ -22,6 +22,10 @@ export class Shape extends Element {
 
   public createPath(...args) {
   }
+  
+  public afterPath() {
+  
+  }
 
   public drawInner(context) {
     const attrs = this.__attrs;
@@ -47,6 +51,7 @@ export class Shape extends Element {
         context.stroke();
       }
     }
+    this.afterPath(context);
   }
 
   /**
