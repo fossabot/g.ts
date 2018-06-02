@@ -1,3 +1,4 @@
+====
 MIT License
 
 Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
@@ -21,9 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-
+====
 Copyright 2010-2016 Mike Bostock
-All rights reserved.
+( https://github.com/d3/d3-color )
+( https://github.com/d3/d3-timer )
+( https://github.com/d3/d3-interpolate )
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:
@@ -50,7 +53,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+====
 MIT License
 
 Copyright (c) 2017-2018 Alipay.inc
