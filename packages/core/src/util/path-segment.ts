@@ -57,8 +57,8 @@ function getArcParams(point1, point2, fa, fs, rx, ry, psiDeg) {
     rx *= Math.sqrt(lambda);
     ry *= Math.sqrt(lambda);
   }
-
-  let f = Math.sqrt((((rx * rx) * (ry * ry)) - ((rx * rx) * (yp * yp)) - ((ry * ry) * (xp * xp))) / ((rx * rx) * (yp * yp) + (ry * ry) * (xp * xp)));
+  const diff = (rx * rx) * (yp * yp) + (ry * ry) * (xp * xp);
+  let f      = Math.sqrt((((rx * rx) * (ry * ry)) - diff) / diff);
 
   if (fa === fs) {
     f *= -1;
@@ -77,13 +77,6 @@ function getArcParams(point1, point2, fa, fs, rx, ry, psiDeg) {
   const u     = [(xp - cxp) / rx, (yp - cyp) / ry];
   const v     = [(-1 * xp - cxp) / rx, (-1 * yp - cyp) / ry];
   let dTheta  = vAngle(u, v);
-
-  if (vRatio(u, v) <= -1) {
-    dTheta = Math.PI;
-  }
-  if (vRatio(u, v) >= 1) {
-    dTheta = 0;
-  }
   if (fs === 0 && dTheta > 0) {
     dTheta = dTheta - 2 * Math.PI;
   }
@@ -100,8 +93,8 @@ export class PathSegment {
   private params: Array<{ x: number; y: number } | { x; y } | any>;
   private subStart: any;
   private endPoint: any;
-  private endTangent: () => Array<number>;
-  private startTangent: () => Array<number>;
+  private endTangent: () => number[];
+  private startTangent: () => number[];
   private box: any;
 
   constructor(item, preSegment, isLast) {
@@ -159,12 +152,8 @@ export class PathSegment {
         this.params       = [preEndPoint, point];
         this.subStart     = preSegment.subStart;
         this.endPoint     = point;
-        this.endTangent   = function() {
-          return [point.x - preEndPoint.x, point.y - preEndPoint.y];
-        };
-        this.startTangent = function() {
-          return [preEndPoint.x - point.x, preEndPoint.y - point.y];
-        };
+        this.endTangent   = () => [point.x - preEndPoint.x, point.y - preEndPoint.y];
+        this.startTangent = () => [preEndPoint.x - point.x, preEndPoint.y - point.y];
         break;
       case 'H':
         if (relative) {
@@ -179,12 +168,8 @@ export class PathSegment {
         this.params       = [preEndPoint, point];
         this.subStart     = preSegment.subStart;
         this.endPoint     = point;
-        this.endTangent   = function() {
-          return [point.x - preEndPoint.x, point.y - preEndPoint.y];
-        };
-        this.startTangent = function() {
-          return [preEndPoint.x - point.x, preEndPoint.y - point.y];
-        };
+        this.endTangent   = () => [point.x - preEndPoint.x, point.y - preEndPoint.y];
+        this.startTangent = () => [preEndPoint.x - point.x, preEndPoint.y - point.y];
         break;
       case 'V':
         if (relative) {
@@ -199,12 +184,8 @@ export class PathSegment {
         this.params       = [preEndPoint, point];
         this.subStart     = preSegment.subStart;
         this.endPoint     = point;
-        this.endTangent   = function() {
-          return [point.x - preEndPoint.x, point.y - preEndPoint.y];
-        };
-        this.startTangent = function() {
-          return [preEndPoint.x - point.x, preEndPoint.y - point.y];
-        };
+        this.endTangent   = () => [point.x - preEndPoint.x, point.y - preEndPoint.y];
+        this.startTangent = () => [preEndPoint.x - point.x, preEndPoint.y - point.y];
         break;
       case 'Q':
         if (relative) {
@@ -224,12 +205,8 @@ export class PathSegment {
         this.params       = [preEndPoint, point1, point2];
         this.subStart     = preSegment.subStart;
         this.endPoint     = point2;
-        this.endTangent   = function() {
-          return [point2.x - point1.x, point2.y - point1.y];
-        };
-        this.startTangent = function() {
-          return [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
-        };
+        this.endTangent   = () => [point2.x - point1.x, point2.y - point1.y];
+        this.startTangent = () => [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
         break;
       case 'T':
         if (relative) {
@@ -246,23 +223,15 @@ export class PathSegment {
           this.params       = [preEndPoint, point1, point2];
           this.subStart     = preSegment.subStart;
           this.endPoint     = point2;
-          this.endTangent   = function() {
-            return [point2.x - point1.x, point2.y - point1.y];
-          };
-          this.startTangent = function() {
-            return [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
-          };
+          this.endTangent   = () => [point2.x - point1.x, point2.y - point1.y];
+          this.startTangent = () => [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
         } else {
           this.command      = 'TL';
           this.params       = [preEndPoint, point2];
           this.subStart     = preSegment.subStart;
           this.endPoint     = point2;
-          this.endTangent   = function() {
-            return [point2.x - preEndPoint.x, point2.y - preEndPoint.y];
-          };
-          this.startTangent = function() {
-            return [preEndPoint.x - point2.x, preEndPoint.y - point2.y];
-          };
+          this.endTangent   = () => [point2.x - preEndPoint.x, point2.y - preEndPoint.y];
+          this.startTangent = () => [preEndPoint.x - point2.x, preEndPoint.y - point2.y];
         }
 
         break;
@@ -289,12 +258,8 @@ export class PathSegment {
         this.params       = [preEndPoint, point1, point2, point3];
         this.subStart     = preSegment.subStart;
         this.endPoint     = point3;
-        this.endTangent   = function() {
-          return [point3.x - point2.x, point3.y - point2.y];
-        };
-        this.startTangent = function() {
-          return [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
-        };
+        this.endTangent   = () => [point3.x - point2.x, point3.y - point2.y];
+        this.startTangent = () => [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
         break;
       case 'S':
         if (relative) {
@@ -316,23 +281,15 @@ export class PathSegment {
           this.params       = [preEndPoint, point1, point2, point3];
           this.subStart     = preSegment.subStart;
           this.endPoint     = point3;
-          this.endTangent   = function() {
-            return [point3.x - point2.x, point3.y - point2.y];
-          };
-          this.startTangent = function() {
-            return [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
-          };
+          this.endTangent   = () => [point3.x - point2.x, point3.y - point2.y];
+          this.startTangent = () => [preEndPoint.x - point1.x, preEndPoint.y - point1.y];
         } else {
           this.command      = 'SQ';
           this.params       = [preEndPoint, point2, point3];
           this.subStart     = preSegment.subStart;
           this.endPoint     = point3;
-          this.endTangent   = function() {
-            return [point3.x - point2.x, point3.y - point2.y];
-          };
-          this.startTangent = function() {
-            return [preEndPoint.x - point2.x, preEndPoint.y - point2.y];
-          };
+          this.endTangent   = () => [point3.x - point2.x, point3.y - point2.y];
+          this.startTangent = () => [preEndPoint.x - point2.x, preEndPoint.y - point2.y];
         }
         break;
       case 'A': {
@@ -350,10 +307,38 @@ export class PathSegment {
           };
         }
 
-        this.command  = 'A';
-        this.params   = getArcParams(preEndPoint, point, fa, fs, rx, ry, psi);
-        this.subStart = preSegment.subStart;
-        this.endPoint = point;
+        this.command   = 'A';
+        const params   = getArcParams(preEndPoint, point, fa, fs, rx, ry, psi);
+        this.params    = params;
+        const start    = preSegment.subStart;
+        this.subStart  = start;
+        this.endPoint  = point;
+        let startAngle = params[5] % (Math.PI * 2);
+        if (Util.isNumberEqual(startAngle, Math.PI * 2)) {
+          startAngle = 0;
+        }
+        let endAngle = params[6] % (Math.PI * 2);
+        if (Util.isNumberEqual(endAngle, Math.PI * 2)) {
+          endAngle = 0;
+        }
+        let d             = 0.001;
+        this.startTangent = () => {
+          if (fs === 0) {
+            d *= -1;
+          }
+          const dx = params[3] * Math.cos(startAngle - d) + params[1];
+          const dy = params[4] * Math.sin(startAngle - d) + params[2];
+          return [dx - start.x, dy - start.y];
+        };
+        this.endTangent   = () => {
+          let endAngle = params[6];
+          if (endAngle - Math.PI * 2 < 0.0001) {
+            endAngle = 0;
+          }
+          const dx = params[3] * Math.cos(startAngle + endAngle + d) + params[1];
+          const dy = params[4] * Math.sin(startAngle + endAngle - d) + params[2];
+          return [preEndPoint.x - dx, preEndPoint.y - dy];
+        };
         break;
       }
       case 'Z': {
@@ -385,7 +370,7 @@ export class PathSegment {
         return Inside.line(
           params[0].x, params[0].y,
           params[1].x, params[1].y,
-          lineWidth, x, y,
+          lineWidth, x, y
         );
       case 'SQ':
       case 'Q':
@@ -393,7 +378,7 @@ export class PathSegment {
           params[0].x, params[0].y,
           params[1].x, params[1].y,
           params[2].x, params[2].y,
-          lineWidth, x, y,
+          lineWidth, x, y
         );
       case 'C': {
         return Inside.cubicline(
@@ -401,7 +386,7 @@ export class PathSegment {
           params[1].x, params[1].y,
           params[2].x, params[2].y,
           params[3].x, params[3].y,
-          lineWidth, x, y,
+          lineWidth, x, y
         );
       }
       case 'A': {

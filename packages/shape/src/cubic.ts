@@ -88,9 +88,9 @@ export class Cubic extends Shape {
   }
 
   public createPath(context) {
-    const attrs            = this.__attrs;
-    const {p1, p2, p3, p4} = attrs;
-    context                = context || self.get('context');
+    const attrs = this.__attrs;
+    const { p1, p2, p3, p4 } = attrs;
+    context = context || self.get('context');
     if (
       Util.isNil(p1) ||
       Util.isNil(p2) ||
@@ -99,13 +99,20 @@ export class Cubic extends Shape {
     ) {
       return;
     }
-
     context.beginPath();
-
-    Arrow.addStartArrow(context, attrs, p2[0], p2[1], p1[0], p1[1]);
     context.moveTo(p1[0], p1[1]);
     context.bezierCurveTo(p2[0], p2[1], p3[0], p3[1], p4[0], p4[1]);
-    Arrow.addEndArrow(context, attrs, p3[0], p3[1], p4[0], p4[1]);
+
+    const attrs = this.__attrs;
+    const { p1, p2, p3, p4 } = attrs;
+    context = context || this.get('context');
+    if (attrs.startArrow) {
+      Arrow.addStartArrow(context, attrs, p2[0], p2[1], p1[0], p1[1]);
+    }
+    if (attrs.endArrow) {
+      Arrow.addEndArrow(context, attrs, p3[0], p3[1], p4[0], p4[1]);
+    }
+    }
   }
 
   public getPoint(t) {
