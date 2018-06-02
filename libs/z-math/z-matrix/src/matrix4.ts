@@ -40,9 +40,38 @@ export class Matrix4 {
     ]);
   }
 
-  constructor(values: number[] = null) {
-    if (values) {
-      this.init(values);
+  constructor(values?: number[]);
+  constructor(a11: number, a12: number, a13: number, a14: number,
+              a21: number, a22: number, a23: number, a24: number,
+              a31: number, a32: number, a33: number, a34: number,
+              a41: number, a42: number, a43: number, a44: number);
+  constructor() {
+    if (arguments.length === 1) {
+      if (arguments[0]) {
+        this.init(arguments[0]);
+      }
+    } else if (arguments.length === 16) {
+      this.values[0]  = arguments[0];
+      this.values[1]  = arguments[1];
+      this.values[2]  = arguments[2];
+      this.values[3]  = arguments[3];
+      this.values[4]  = arguments[4];
+      this.values[5]  = arguments[5];
+      this.values[6]  = arguments[6];
+      this.values[7]  = arguments[7];
+      this.values[8]  = arguments[8];
+      this.values[9]  = arguments[9];
+      this.values[10] = arguments[10];
+      this.values[11] = arguments[11];
+      this.values[12] = arguments[12];
+      this.values[13] = arguments[13];
+      this.values[14] = arguments[14];
+      this.values[15] = arguments[15];
+    } else {
+      this.values[0] = this.values[1] = this.values[2] = this.values[3] = 0;
+      this.values[4] = this.values[5] = this.values[6] = this.values[7] = 0;
+      this.values[8] = this.values[9] = this.values[10] = this.values[11] = 0;
+      this.values[12] = this.values[13] = this.values[14] = this.values[15] = 0;
     }
   }
 
@@ -980,6 +1009,15 @@ export class Matrix4 {
    */
   public clone() {
     return this.copy();
+  }
+
+  public static zero(): Matrix4 {
+    return new Matrix4(
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0,
+      0, 0, 0, 0
+    );
   }
 
   /**

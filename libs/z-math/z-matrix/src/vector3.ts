@@ -96,6 +96,14 @@ export class Vector3 {
     return dest;
   }
 
+  public setFrom(v: Vector3) {
+    this.x = v.x;
+    this.y = v.y;
+    this.z = v.z;
+
+    return this;
+  }
+
   public negate(dest: Vector3 = null): Vector3 {
     if (!dest) {
       dest = this;

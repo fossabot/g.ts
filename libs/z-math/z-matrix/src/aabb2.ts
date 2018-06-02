@@ -11,7 +11,6 @@ import {Vector2} from "./vector2";
 
 export class Aabb2 {
 
-
   public get min() {
     return this._min;
   }

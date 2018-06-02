@@ -11,9 +11,8 @@ import {Vector2} from './vector2';
 /**
  * use row-major, because such matrix can represent as
  * ```
- *  [[1, 0, 0],
- *   [0, 1, 0],
- *   [0, 0, 1]]
+ *  [[1, 0],
+ *   [0, 0]]
  * ```
  */
 export class Matrix2 {
@@ -21,9 +20,21 @@ export class Matrix2 {
 
   private values = new Float32Array(4);
 
-  constructor(values: number[] = null) {
-    if (values) {
-      this.init(values);
+  constructor(values?: number[]);
+  constructor(a11: number, a12: number,
+              a21: number, a22: number);
+  constructor() {
+    if (arguments.length === 1) {
+      if (arguments[0]) {
+        this.init(arguments[0]);
+      }
+    } else if (arguments.length === 4) {
+      this.values[0] = arguments[0];
+      this.values[1] = arguments[1];
+      this.values[2] = arguments[2];
+      this.values[3] = arguments[3];
+    } else {
+      this.values[0] = this.values[1] = this.values[2] = this.values[3] = 0;
     }
   }
 
@@ -186,8 +197,8 @@ export class Matrix2 {
   }
 
   public setRotation(radians: number) {
-    const c = Math.cos(radians);
-    const s = Math.sin(radians);
+    const c        = Math.cos(radians);
+    const s        = Math.sin(radians);
     this.values[0] = c;
     this.values[1] = -s;
     this.values[2] = s;
