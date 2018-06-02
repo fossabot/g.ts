@@ -117,6 +117,9 @@ export class Vector2 {
     return this;
   }
 
+  // tslint:disable-next-line
+  public sub = this.subtract.bind(this);
+
   public multiply(vector: Vector2): Vector2 {
     this.x *= vector.x;
     this.y *= vector.y;
@@ -124,12 +127,18 @@ export class Vector2 {
     return this;
   }
 
+  // tslint:disable-next-line
+  public mul = this.multiply.bind(this);
+
   public divide(vector: Vector2): Vector2 {
     this.x /= vector.x;
     this.y /= vector.y;
 
     return this;
   }
+
+  // tslint:disable-next-line
+  public div = this.divide.bind(this);
 
   /**
    * Math.ceil the components of a vec2
@@ -241,8 +250,11 @@ export class Vector2 {
     return out;
   }
 
-  public clone() {
-    return this.copy();
+  public setFrom(v: Vector2) {
+    this.x = v.x;
+    this.y = v.y;
+
+    return this;
   }
 
   public multiplyMatrix3(matrix: Matrix3, out: Vector2 = null): Vector2 {
@@ -251,6 +263,10 @@ export class Vector2 {
     }
 
     return Matrix3.multiplyVector2(matrix, this, out);
+  }
+
+  public clone() {
+    return this.copy();
   }
 
   public static cross(vector: Vector2, vector2: Vector2, out: Vector3 = null): Vector3 {

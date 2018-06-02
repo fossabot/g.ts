@@ -256,6 +256,9 @@ export class Vector4 {
     return this;
   }
 
+  // tslint:disable-next-line
+  public sub = this.subtract.bind(this);
+
   public multiply(vector: Vector4): Vector4 {
     this.x *= vector.x;
     this.y *= vector.y;
@@ -265,6 +268,9 @@ export class Vector4 {
     return this;
   }
 
+  // tslint:disable-next-line
+  public mul = this.multiply.bind(this);
+
   public divide(vector: Vector4): Vector4 {
     this.x /= vector.x;
     this.y /= vector.y;
@@ -273,6 +279,9 @@ export class Vector4 {
 
     return this;
   }
+
+  // tslint:disable-next-line
+  public div = this.divide.bind(this);
 
   public scale(value: number, dest: Vector4 = null): Vector4 {
     if (!dest) {

@@ -152,6 +152,9 @@ export class Vector3 {
     return this;
   }
 
+  // tslint:disable-next-line
+  public sub = this.subtract.bind(this);
+
   public multiply(vector: Vector3): Vector3 {
     this.x *= vector.x;
     this.y *= vector.y;
@@ -160,6 +163,9 @@ export class Vector3 {
     return this;
   }
 
+  // tslint:disable-next-line
+  public mul = this.multiply.bind(this);
+
   public divide(vector: Vector3): Vector3 {
     this.x /= vector.x;
     this.y /= vector.y;
@@ -167,6 +173,9 @@ export class Vector3 {
 
     return this;
   }
+
+  // tslint:disable-next-line
+  public div = this.divide.bind(this);
 
   public scale(value: number, dest: Vector3 = null): Vector3 {
     if (!dest) {
