@@ -6,46 +6,240 @@
  * See LICENSE file in the project root for full license information.
  */
 
+import {EPSILON} from './common';
 import {Matrix2} from './matrix2';
 import {Matrix3} from './matrix3';
 import {Vector3} from './vector3';
+import {Vector4} from './vector4';
 
 export class Vector2 {
   public static zero = new Vector2([0, 0]);
 
   private values = new Float32Array(2);
 
-  get x(): number {
-    return this.values[0];
+  set r(arg: number) { this.values[0] = arg; }
+
+  set g(arg: number) { this.values[1] = arg; }
+
+  set s(arg: number) { this.values[0] = arg; }
+
+  set t(arg: number) { this.values[1] = arg; }
+
+  set x(arg: number) { this.values[0] = arg; }
+
+  set y(arg: number) { this.values[1] = arg; }
+
+  set rg(arg: Vector2) { this.xy = arg; }
+
+  set gr(arg: Vector2) { this.yx = arg; }
+
+  set st(arg: Vector2) { this.xy = arg; }
+
+  set ts(arg: Vector2) { this.yx = arg; }
+
+  set xy(v: Vector2) {
+    this.values[0] = v.x;
+    this.values[1] = v.y;
   }
 
-  get y(): number {
-    return this.values[1];
+  set yx(v: Vector2) {
+    this.values[1] = v.x;
+    this.values[0] = v.y;
   }
 
-  get xy(): number[] {
-    return [
-      this.values[0],
-      this.values[1],
-    ];
-  }
+  get xx(): Vector2 { return new Vector2(this.values[0], this.values[0]); }
 
-  set x(value: number) {
-    this.values[0] = value;
-  }
+  get xy(): Vector2 { return new Vector2(this.values[0], this.values[1]); }
 
-  set y(value: number) {
-    this.values[1] = value;
-  }
+  get yx(): Vector2 { return new Vector2(this.values[1], this.values[0]); }
 
-  set xy(values: number[]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-  }
+  get yy(): Vector2 { return new Vector2(this.values[1], this.values[1]); }
 
-  constructor(values: number[] = null) {
-    if (values) {
-      this.xy = values;
+  get xxx(): Vector3 { return new Vector3(this.values[0], this.values[0], this.values[0]); }
+
+  get xxy(): Vector3 { return new Vector3(this.values[0], this.values[0], this.values[1]); }
+
+  get xyx(): Vector3 { return new Vector3(this.values[0], this.values[1], this.values[0]); }
+
+  get xyy(): Vector3 { return new Vector3(this.values[0], this.values[1], this.values[1]); }
+
+  get yxx(): Vector3 { return new Vector3(this.values[1], this.values[0], this.values[0]); }
+
+  get yxy(): Vector3 { return new Vector3(this.values[1], this.values[0], this.values[1]); }
+
+  get yyx(): Vector3 { return new Vector3(this.values[1], this.values[1], this.values[0]); }
+
+  get yyy(): Vector3 { return new Vector3(this.values[1], this.values[1], this.values[1]); }
+
+  get xxxx(): Vector4 { return new Vector4(this.values[0], this.values[0], this.values[0], this.values[0]); }
+
+  get xxxy(): Vector4 { return new Vector4(this.values[0], this.values[0], this.values[0], this.values[1]); }
+
+  get xxyx(): Vector4 { return new Vector4(this.values[0], this.values[0], this.values[1], this.values[0]); }
+
+  get xxyy(): Vector4 { return new Vector4(this.values[0], this.values[0], this.values[1], this.values[1]); }
+
+  get xyxx(): Vector4 { return new Vector4(this.values[0], this.values[1], this.values[0], this.values[0]); }
+
+  get xyxy(): Vector4 { return new Vector4(this.values[0], this.values[1], this.values[0], this.values[1]); }
+
+  get xyyx(): Vector4 { return new Vector4(this.values[0], this.values[1], this.values[1], this.values[0]); }
+
+  get xyyy(): Vector4 { return new Vector4(this.values[0], this.values[1], this.values[1], this.values[1]); }
+
+  get yxxx(): Vector4 { return new Vector4(this.values[1], this.values[0], this.values[0], this.values[0]); }
+
+  get yxxy(): Vector4 { return new Vector4(this.values[1], this.values[0], this.values[0], this.values[1]); }
+
+  get yxyx(): Vector4 { return new Vector4(this.values[1], this.values[0], this.values[1], this.values[0]); }
+
+  get yxyy(): Vector4 { return new Vector4(this.values[1], this.values[0], this.values[1], this.values[1]); }
+
+  get yyxx(): Vector4 { return new Vector4(this.values[1], this.values[1], this.values[0], this.values[0]); }
+
+  get yyxy(): Vector4 { return new Vector4(this.values[1], this.values[1], this.values[0], this.values[1]); }
+
+  get yyyx(): Vector4 { return new Vector4(this.values[1], this.values[1], this.values[1], this.values[0]); }
+
+  get yyyy(): Vector4 { return new Vector4(this.values[1], this.values[1], this.values[1], this.values[1]); }
+
+  get r(): number { return this.x; }
+
+  get g(): number { return this.y; }
+
+  get s(): number { return this.x; }
+
+  get t(): number { return this.y; }
+
+  get x(): number { return this.values[0]; }
+
+  get y(): number { return this.values[1]; }
+
+  get rr(): Vector2 { return this.xx; }
+
+  get rg(): Vector2 { return this.xy; }
+
+  get gr(): Vector2 { return this.yx; }
+
+  get gg(): Vector2 { return this.yy; }
+
+  get rrr(): Vector3 { return this.xxx; }
+
+  get rrg(): Vector3 { return this.xxy; }
+
+  get rgr(): Vector3 { return this.xyx; }
+
+  get rgg(): Vector3 { return this.xyy; }
+
+  get grr(): Vector3 { return this.yxx; }
+
+  get grg(): Vector3 { return this.yxy; }
+
+  get ggr(): Vector3 { return this.yyx; }
+
+  get ggg(): Vector3 { return this.yyy; }
+
+  get rrrr(): Vector4 { return this.xxxx; }
+
+  get rrrg(): Vector4 { return this.xxxy; }
+
+  get rrgr(): Vector4 { return this.xxyx; }
+
+  get rrgg(): Vector4 { return this.xxyy; }
+
+  get rgrr(): Vector4 { return this.xyxx; }
+
+  get rgrg(): Vector4 { return this.xyxy; }
+
+  get rggr(): Vector4 { return this.xyyx; }
+
+  get rggg(): Vector4 { return this.xyyy; }
+
+  get grrr(): Vector4 { return this.yxxx; }
+
+  get grrg(): Vector4 { return this.yxxy; }
+
+  get grgr(): Vector4 { return this.yxyx; }
+
+  get grgg(): Vector4 { return this.yxyy; }
+
+  get ggrr(): Vector4 { return this.yyxx; }
+
+  get ggrg(): Vector4 { return this.yyxy; }
+
+  get gggr(): Vector4 { return this.yyyx; }
+
+  get gggg(): Vector4 { return this.yyyy; }
+
+  get ss(): Vector2 { return this.xx; }
+
+  get st(): Vector2 { return this.xy; }
+
+  get ts(): Vector2 { return this.yx; }
+
+  get tt(): Vector2 { return this.yy; }
+
+  get sss(): Vector3 { return this.xxx; }
+
+  get sst(): Vector3 { return this.xxy; }
+
+  get sts(): Vector3 { return this.xyx; }
+
+  get stt(): Vector3 { return this.xyy; }
+
+  get tss(): Vector3 { return this.yxx; }
+
+  get tst(): Vector3 { return this.yxy; }
+
+  get tts(): Vector3 { return this.yyx; }
+
+  get ttt(): Vector3 { return this.yyy; }
+
+  get ssss(): Vector4 { return this.xxxx; }
+
+  get ssst(): Vector4 { return this.xxxy; }
+
+  get ssts(): Vector4 { return this.xxyx; }
+
+  get sstt(): Vector4 { return this.xxyy; }
+
+  get stss(): Vector4 { return this.xyxx; }
+
+  get stst(): Vector4 { return this.xyxy; }
+
+  get stts(): Vector4 { return this.xyyx; }
+
+  get sttt(): Vector4 { return this.xyyy; }
+
+  get tsss(): Vector4 { return this.yxxx; }
+
+  get tsst(): Vector4 { return this.yxxy; }
+
+  get tsts(): Vector4 { return this.yxyx; }
+
+  get tstt(): Vector4 { return this.yxyy; }
+
+  get ttss(): Vector4 { return this.yyxx; }
+
+  get ttst(): Vector4 { return this.yyxy; }
+
+  get ttts(): Vector4 { return this.yyyx; }
+
+  get tttt(): Vector4 { return this.yyyy; }
+
+  constructor(values?: number[]);
+  constructor(x: number, y: number);
+  constructor() {
+    if (arguments.length === 1) {
+      if (arguments[0]) {
+        this.xy = arguments[0];
+      }
+    } else if (arguments.length === 2) {
+      this.values[0] = arguments[0];
+      this.values[1] = arguments[1];
+    } else {
+      this.values[0] = 0;
+      this.values[1] = 1;
     }
   }
 

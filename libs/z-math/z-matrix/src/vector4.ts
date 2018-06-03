@@ -6,7 +6,6 @@
  * See LICENSE file in the project root for full license information.
  */
 
-// tslint:disable:member-ordering
 import {Matrix4} from './matrix4';
 
 export class Vector4 {
@@ -162,9 +161,23 @@ export class Vector4 {
     this.values[3] = values[3];
   }
 
-  constructor(values: number[] = null) {
-    if (values) {
-      this.xyzw = values;
+  constructor(values?: number[]);
+  constructor(arg0: number, arg1: number, arg2: number, arg3: number);
+  constructor() {
+    if (arguments.length === 1) {
+      if (arguments[0]) {
+        this.xyzw = arguments[0];
+      }
+    } else if (arguments.length === 4) {
+      this.values[0] = arguments[0];
+      this.values[1] = arguments[1];
+      this.values[2] = arguments[2];
+      this.values[3] = arguments[3];
+    } else {
+      this.values[0] = 0;
+      this.values[1] = 0;
+      this.values[2] = 0;
+      this.values[3] = 0;
     }
   }
 

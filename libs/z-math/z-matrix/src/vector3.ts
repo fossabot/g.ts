@@ -68,9 +68,21 @@ export class Vector3 {
     this.values[2] = values[2];
   }
 
-  constructor(values: number[] = null) {
-    if (values) {
-      this.xyz = values;
+  constructor(values?: number[]);
+  constructor(arg0: number, arg1: number, arg2: number);
+  constructor() {
+    if (arguments.length === 1) {
+      if (arguments[0]) {
+        this.xyz = arguments[0];
+      }
+    } else if (arguments.length === 3) {
+      this.values[0] = arguments[0];
+      this.values[1] = arguments[1];
+      this.values[2] = arguments[2];
+    } else {
+      this.values[0] = 0;
+      this.values[1] = 0;
+      this.values[2] = 0;
     }
   }
 

@@ -6,9 +6,9 @@
  * See LICENSE file in the project root for full license information.
  */
 
-const EPSILON = 0.000001;
+export const EPSILON = 0.000001;
 
-const degree = Math.PI / 180;
+export const degree = Math.PI / 180;
 
 /**
  * Convert Degree To Radian

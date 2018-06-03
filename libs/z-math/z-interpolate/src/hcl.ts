@@ -7,16 +7,16 @@
  * See LICENSE file in the project root for full license information.
  */
 
-import {hcl as colorHcl} from 'd3-color';
+import {hcl as colorHcl} from '@gradii/z-math/z-color';
 import {interpolateColor, interpolateHue} from './color';
 
 function hcl(hue) {
-  return function(start, end) {
+  return (start, end) => {
     let h = hue((start = colorHcl(start)).h, (end = colorHcl(end)).h),
         c       = interpolateColor(start.c, end.c),
         l       = interpolateColor(start.l, end.l),
         opacity = interpolateColor(start.opacity, end.opacity);
-    return function(t) {
+    return (t) => {
       start.h       = h(t);
       start.c       = c(t);
       start.l       = l(t);

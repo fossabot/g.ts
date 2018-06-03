@@ -60,7 +60,7 @@ export class ColorCubehelix extends Color {
       255 * (l + a * (A * cosh + B * sinh)),
       255 * (l + a * (C * cosh + D * sinh)),
       255 * (l + a * (E * cosh)),
-      this.opacity,
+      this.opacity
     );
   }
 }

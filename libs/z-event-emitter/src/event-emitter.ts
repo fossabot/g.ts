@@ -63,8 +63,7 @@ export class EventEmitter {
     return flatListeners;
   }
 
-  public getListenersAsObject(event: string): { [event: string]: ListenerFunction[] };
-  public getListenersAsObject(event: RegExp): { [event: string]: ListenerFunction[] };
+  public getListenersAsObject(event: string | RegExp): { [event: string]: ListenerFunction[] };
   /**
    * Fetches the requested listeners via getListeners but will always return the results inside an object. This is mainly for internal use but others may find it useful.
    *
@@ -149,12 +148,12 @@ export class EventEmitter {
   /**
    * Uses defineEvent to define multiple events.
    *
-   * @param {String[]} evts An array of event names to define.
+   * @param {String[]} events An array of event names to define.
    * @return {Object} Current instance of EventEmitter for chaining.
    */
-  public defineEvents(evts) {
-    for (let i = 0; i < evts.length; i += 1) {
-      this.defineEvent(evts[i]);
+  public defineEvents(events) {
+    for (let event of events) {
+      this.defineEvent(event);
     }
     return this;
   }

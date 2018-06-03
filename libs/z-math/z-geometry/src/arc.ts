@@ -7,7 +7,6 @@
  */
 
 import {mod} from '@gradii/g/core';
-import {vec2} from '@gradii/g/gl-matrix';
 
 export namespace arc {
 
