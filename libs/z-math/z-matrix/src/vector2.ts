@@ -6,7 +6,7 @@
  * See LICENSE file in the project root for full license information.
  */
 
-import {EPSILON} from './common';
+import {clamp, EPSILON} from './common';
 import {Matrix2} from './matrix2';
 import {Matrix3} from './matrix3';
 import {Vector3} from './vector3';
@@ -17,6 +17,7 @@ export class Vector2 {
 
   private values = new Float32Array(2);
 
+  // region getter setter
   set r(arg: number) { this.values[0] = arg; }
 
   set g(arg: number) { this.values[1] = arg; }
@@ -227,6 +228,8 @@ export class Vector2 {
 
   get tttt(): Vector4 { return this.yyyy; }
 
+  // endregion
+
   constructor(values?: number[]);
   constructor(x: number, y: number);
   constructor() {
@@ -263,15 +266,33 @@ export class Vector2 {
     return out;
   }
 
-  public negate(out: Vector2 = null): Vector2 {
-    if (!out) {
-      out = this;
-    }
+  public setValues(x: number, y: number) {
+    this.values[0] = x;
+    this.values[1] = y;
+    return this;
+  }
 
-    out.x = -this.x;
-    out.y = -this.y;
+  public setFrom(v: Vector2) {
+    this.x = v.x;
+    this.y = v.y;
+    return this;
+  }
 
-    return out;
+  public splat(arg: number) {
+    this.values[0] = arg;
+    this.values[1] = arg;
+    return this;
+  }
+
+  public negate(): Vector2 {
+    this.values[0] = -this.values[0];
+    this.values[1] = -this.values[1];
+    return this;
+  }
+
+  public absolute() {
+    this.values[0] = Math.abs(this.values[0]);
+    this.values[1] = Math.abs(this.values[1]);
   }
 
   public equals(vector: Vector2, threshold = EPSILON): boolean {
@@ -370,14 +391,27 @@ export class Vector2 {
    * @param {vec2} out the receiving vector
    * @returns {vec2} out
    */
-  public round(out: Vector2 = null) {
-    if (!out) {
-      out = new Vector2();
-    }
+  public round() {
+    this.x = Math.round(this.x);
+    this.y = Math.round(this.y);
+    return this;
+  }
 
-    out.x = Math.round(this.x);
-    out.y = Math.round(this.y);
-    return out;
+  public roundToZero() {
+    this.values[0] = this.values[0] < 0 ? Math.ceil(this.values[0]) : Math.floor(this.values[0]);
+    this.values[1] = this.values[1] < 0 ? Math.ceil(this.values[1]) : Math.floor(this.values[1]);
+  }
+
+  public clamp(min: Vector2, max: Vector2) {
+    this.values[0] = clamp(this.values[0], min.values[0], max.values[0]);
+    this.values[1] = clamp(this.values[1], min.values[1], max.values[1]);
+    return this;
+  }
+
+  public clampScalar(min: number, max: number) {
+    this.values[0] = clamp(this.values[0], min, max);
+    this.values[1] = clamp(this.values[1], min, max);
+    return this;
   }
 
   public scale(value: number, out: Vector2 = null): Vector2 {
@@ -391,30 +425,55 @@ export class Vector2 {
     return out;
   }
 
+  public scaled(value: number) {
+    return this.clone().scale(value);
+  }
+
   public normalize(out: Vector2 = null): Vector2 {
     if (!out) {
       out = this;
     }
 
     let length = this.length();
-
     if (length === 1) {
       return this;
-    }
-
-    if (length === 0) {
+    } else if (length === 0) {
       out.x = 0;
       out.y = 0;
-
+      return out;
+    } else {
+      length = 1.0 / length;
+      out.x *= length;
+      out.y *= length;
       return out;
     }
+  }
 
-    length = 1.0 / length;
+  public normalized() {
+    return this.clone().normalize();
+  }
 
-    out.x *= length;
-    out.y *= length;
+  public distanceTo(arg: Vector2) {
+    return Math.sqrt(this.distanceToSquared(arg));
+  }
 
-    return out;
+  public distanceToSquared(arg: Vector2) {
+    const dx = this.x - arg.x;
+    const dy = this.y - arg.y;
+
+    return dx * dx + dy * dy;
+  }
+
+  public angleTo(other: Vector2) {
+    return Vector2.angle(this, other);
+  }
+
+  public angleToSigned(other: Vector2) {
+    return Vector2.angleSigned(this, other);
+  }
+
+  public dot(other: Vector2) {
+    return Vector2.dot(this, other);
   }
 
   public multiplyMatrix2(matrix: Matrix2, out: Vector2 = null): Vector2 {
@@ -423,6 +482,30 @@ export class Vector2 {
     }
 
     return matrix.transform(out);
+  }
+
+  public reflect(normal: Vector2) {
+    return this.sub(normal.scaled(2 * normal.dot(this)));
+  }
+
+  public refleted(normal: Vector2) {
+    return this.clone().reflect(normal);
+  }
+
+  /**
+   * 相对误差
+   */
+  public relativeError(correct: Vector2) {
+    const correctNorm = correct.length();
+    const diffNorm    = (this.clone().sub(correct)).length();
+    return diffNorm / correctNorm;
+  }
+
+  /**
+   * 绝对误差
+   */
+  public absoluteError(correct: Vector2) {
+    return (this.clone().sub(correct)).length();
   }
 
   public vertical(flag, out?: Vector2) {
@@ -444,13 +527,6 @@ export class Vector2 {
     return out;
   }
 
-  public setFrom(v: Vector2) {
-    this.x = v.x;
-    this.y = v.y;
-
-    return this;
-  }
-
   public multiplyMatrix3(matrix: Matrix3, out: Vector2 = null): Vector2 {
     if (!out) {
       out = this;
@@ -463,28 +539,12 @@ export class Vector2 {
     return this.copy();
   }
 
-  public static cross(vector: Vector2, vector2: Vector2, out: Vector3 = null): Vector3 {
-    if (!out) {
-      out = new Vector3();
-    }
-
-    let x = vector.x,
-        y = vector.y;
-
-    let x2 = vector2.x,
-        y2 = vector2.y;
-
-    let z = x * y2 - y * x2;
-
-    out.x = 0;
-    out.y = 0;
-    out.z = z;
-
-    return out;
+  public static cross(vector: Vector2, vector2: Vector2): number {
+    return vector.x * vector2.y - vector.y * vector2.x;
   }
 
   public static dot(vector: Vector2, vector2: Vector2): number {
-    return (vector.x * vector2.x + vector.y * vector2.y);
+    return vector.x * vector2.x + vector.y * vector2.y;
   }
 
   public static distance(vector: Vector2, vector2: Vector2): number {
@@ -630,8 +690,17 @@ export class Vector2 {
     return out;
   }
 
-  public static angle(v1, v2) {
+  public static angle(v1: Vector2, v2: Vector2) {
+    if (v1.values[0] === v2.values[0] && v1.values[1] === v2.values[1]) { return 0; }
     const theta = Vector2.dot(v1, v2) / (v1.length() * v2.length());
     return Math.acos(Math.max(Math.min(theta, -1), 1));
   }
+
+  public static angleSigned(v1: Vector2, v2: Vector2) {
+    if (v1.values[0] === v2.values[0] && v1.values[1] === v2.values[1]) { return 0; }
+    const s = Vector2.cross(v1, v2);
+    const c = Vector2.dot(v1, v2);
+    return Math.atan2(s, c);
+  }
+
 }

@@ -17,6 +17,11 @@ Conclusion:
 - because gl-matrix is pure function. so some of api should convert to class or static. 
 it is hard to choice which api should be non static or static. `NEVER MIND`
 
+### Guide
+
+- Ask: missing of parameter `out`/`dest`) ? no more out? <br/>
+  Ans: use `value.copy(out)`, it means that clone value to a same type of `out`. then can use any out.operator to calculate
+  no need to use. most method have removed `out` or `dest` parameter
 
 ### Schedule Board
 

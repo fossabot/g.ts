@@ -116,6 +116,12 @@ export class Vector3 {
     return this;
   }
 
+  public setValues(x: number, y: number, z: number) {
+    this.values[0] = x;
+    this.values[1] = y;
+    this.values[2] = z;
+  }
+
   public negate(dest: Vector3 = null): Vector3 {
     if (!dest) {
       dest = this;

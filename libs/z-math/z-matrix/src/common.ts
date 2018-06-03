@@ -31,3 +31,12 @@ export function toRadian(a: number) {
 export function equals(a: number, b: number) {
   return Math.abs(a - b) <= EPSILON * Math.max(1.0, Math.abs(a), Math.abs(b));
 }
+
+/**
+ * @private
+ */
+export function clamp(value, min, max) {
+  return min < max
+    ? (value < min ? min : value > max ? max : value)
+    : (value < max ? max : value > min ? min : value);
+}

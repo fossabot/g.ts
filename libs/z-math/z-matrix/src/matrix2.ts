@@ -280,10 +280,10 @@ export class Matrix2 {
     let x = vector.x,
         y = vector.y;
 
-    vector.xy = [
+    vector.setValues(
       x * this.values[0] + y * this.values[1],
-      x * this.values[2] + y * this.values[3],
-    ];
+      x * this.values[2] + y * this.values[3]
+    );
 
     return vector;
   }

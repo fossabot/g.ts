@@ -380,27 +380,28 @@ export class Matrix3 {
   }
 
   public rotateVector3(v: Vector3) {
-    v.xyz = [
+    v.setValues(
       v.x * this.values[0] + v.y * this.values[1] + v.z * this.values[2],
       v.x * this.values[3] + v.y * this.values[4] + v.z * this.values[5],
       v.x * this.values[6] + v.y * this.values[7] + v.z * this.values[8],
-    ];
+    );
     return v;
   }
 
   public rotateVector2(v: Vector2) {
-    v.xy = [
+    v.setValues(
       v.x * this.values[0] + v.y * this.values[1],
-      v.x * this.values[3] + v.y * this.values[4],
-    ];
+      v.x * this.values[3] + v.y * this.values[4]
+    );
     return v;
   }
 
   public transformVector2(v: Vector2): Vector2 {
-    v.xy = [
-      v.x * this.values[0] + v.y * this.values[1] + this.values[2],
-      v.x * this.values[3] + v.y * this.values[4] + this.values[5],
-    ];
+    const _x = v.x * this.values[0] + v.y * this.values[1] + this.values[2];
+    const _y = v.x * this.values[3] + v.y * this.values[4] + this.values[5];
+
+    v.x = _x;
+    v.y = _y;
     return v;
   }
 

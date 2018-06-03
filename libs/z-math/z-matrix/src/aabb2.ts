@@ -56,9 +56,8 @@ export class Aabb2 {
     const center      = new Vector2();
     const halfExtents = new Vector2();
     this.copyCenterAndHalfExtents(center, halfExtents);
-    m
-      .transformVector2(center)
-      .rotate(halfExtents);
+    m.transformVector2(center);
+    m.absoluteRotate2(halfExtents);
 
     this._min
       .setFrom(center)
