@@ -22,6 +22,12 @@
       ],
       "@gradii/g/*": [
         "packages/*/index"
+      ],
+      "@gradii/*": [
+        "libs/*/public-api"
+      ],
+      "@gradii/z-math/*": [
+        "libs/z-math/*/public-api"
       ]
     }
   },
