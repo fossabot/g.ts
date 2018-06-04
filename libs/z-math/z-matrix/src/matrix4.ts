@@ -186,6 +186,27 @@ export class Matrix4 {
     return this;
   }
 
+  public setFrom(arg: Matrix4) {
+    this.values[0]  = arg.values[0];
+    this.values[1]  = arg.values[1];
+    this.values[2]  = arg.values[2];
+    this.values[3]  = arg.values[3];
+    this.values[4]  = arg.values[4];
+    this.values[5]  = arg.values[5];
+    this.values[6]  = arg.values[6];
+    this.values[7]  = arg.values[7];
+    this.values[8]  = arg.values[8];
+    this.values[9]  = arg.values[9];
+    this.values[10] = arg.values[10];
+    this.values[11] = arg.values[11];
+    this.values[12] = arg.values[12];
+    this.values[13] = arg.values[13];
+    this.values[14] = arg.values[14];
+    this.values[15] = arg.values[15];
+
+    return this;
+  }
+
   public equals(matrix: Matrix4, threshold = EPSILON): boolean {
     for (let i = 0; i < 16; i++) {
       if (Math.abs(this.values[i] - matrix.at(i)) > threshold) {
