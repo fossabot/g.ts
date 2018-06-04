@@ -8,7 +8,6 @@
 
 import {clamp, EPSILON} from './common';
 import {Matrix2} from './matrix2';
-import {Matrix3} from './matrix3';
 import {Vector3} from './vector3';
 import {Vector4} from './vector4';
 

@@ -496,7 +496,7 @@ export class Matrix4 {
   // tslint:disable-next-line
   public transform = this.transformVector4.bind(this);
 
-  public transform3(v: Vector3) {
+  public transformVector3(v: Vector3) {
     const x  = v.x,
           y  = v.y,
           z  = v.z;
@@ -507,6 +507,9 @@ export class Matrix4 {
     v.setValues(_x, _y, _z);
     return v;
   }
+
+  // tslint:disable-next-line
+  public transform3 = this.transformVector3.bind(this);
 
   public toMatrix3(): Matrix3 {
     return new Matrix3([
@@ -824,6 +827,28 @@ export class Matrix4 {
     this.values[12] = 0;
     this.values[13] = 0;
     this.values[14] = 0;
+  }
+
+  public rotateVector3(v: Vector3) {
+    v.setValues(
+      this.values[0] * v.x + this.values[1] * v.y + this.values[2] * v.z,
+      this.values[4] * v.x + this.values[5] * v.y + this.values[6] * v.z,
+      this.values[8] * v.x + this.values[9] * v.y + this.values[10] * v.z
+    );
+
+    return v;
+  }
+
+  // tslint:disable-next-line
+  public rotate3 = this.rotateVector3.bind(this);
+
+  public rotated3(v: Vector3, out?: Vector3) {
+    if (!out) {
+      out = v.clone();
+    } else {
+      out.setFrom(v);
+    }
+    return this.rotateVector3(out);
   }
 
   /**

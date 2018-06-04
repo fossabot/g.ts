@@ -378,11 +378,11 @@ export class Matrix3 {
   }
 
   public transformVector3(v: Vector3) {
-    v.xyz = [
+    v.setValues(
       v.x + this.values[0] + v.y * this.values[1] + this.values[2],
       v.x + this.values[3] + v.y * this.values[4] + this.values[5],
       v.x + this.values[6] + v.y * this.values[7] + this.values[8],
-    ];
+    );
 
     return v;
   }

@@ -5,10 +5,9 @@
  * Use of this source code is governed by an MIT-style license.
  * See LICENSE file in the project root for full license information.
  */
+import {Vector2} from "./vector2";
 
 export class Vector3 {
-  public static zero = new Vector3([0, 0, 0]);
-
   public static up      = new Vector3([0, 1, 0]);
   public static right   = new Vector3([1, 0, 0]);
   public static forward = new Vector3([0, 0, 1]);
@@ -27,19 +26,19 @@ export class Vector3 {
     return this.values[2];
   }
 
-  get xy(): number[] {
-    return [
+  get xy(): Vector2 {
+    return new Vector2(
       this.values[0],
-      this.values[1],
-    ];
+      this.values[1]
+    );
   }
 
-  get xyz(): number[] {
-    return [
+  get xyz(): Vector3 {
+    return new Vector3(
       this.values[0],
       this.values[1],
-      this.values[2],
-    ];
+      this.values[2]
+    );
   }
 
   set x(value: number) {
@@ -54,15 +53,15 @@ export class Vector3 {
     this.values[2] = value;
   }
 
-  set xy(values: number[]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
+  set xy(v: Vector2) {
+    this.values[0] = v.x;
+    this.values[1] = v.y;
   }
 
-  set xyz(values: number[]) {
-    this.values[0] = values[0];
-    this.values[1] = values[1];
-    this.values[2] = values[2];
+  set xyz(v: Vector3) {
+    this.values[0] = v.values[0];
+    this.values[1] = v.values[1];
+    this.values[2] = v.values[2];
   }
 
   constructor(values?: number[]);
@@ -70,7 +69,9 @@ export class Vector3 {
   constructor() {
     if (arguments.length === 1) {
       if (arguments[0]) {
-        this.xyz = arguments[0];
+        this.values[0] = arguments[0][0];
+        this.values[1] = arguments[0][1];
+        this.values[2] = arguments[0][2];
       }
     } else if (arguments.length === 3) {
       this.values[0] = arguments[0];
@@ -380,6 +381,10 @@ export class Vector3 {
     dest.z = vector.z / vector2.z;
 
     return dest;
+  }
+
+  public static zero() {
+    return new Vector3(0, 0, 0);
   }
 
 }
