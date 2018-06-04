@@ -17,38 +17,6 @@ export class Matrix3 {
 
   private values = new Float32Array(9);
 
-  /**
-   * TODO
-   * @returns {Vector3}
-   */
-  public get right() {
-    return new Vector3([
-      this.values[0],
-      this.values[3],
-      this.values[6],
-    ]);
-  }
-
-  /**
-   * TODO
-   * @returns {Vector3}
-   */
-  public get up() {
-    return new Vector3([
-      this.values[1],
-      this.values[4],
-      this.values[7],
-    ]);
-  }
-
-  public get forward() {
-    return new Vector3([
-      this.values[2],
-      this.values[5],
-      this.values[8],
-    ]);
-  }
-
   constructor(values?: number[])
   constructor(a11: number, a12: number, a13: number,
               a21: number, a22: number, a23: number,

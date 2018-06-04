@@ -16,30 +16,6 @@ export class Matrix4 {
 
   private values = new Float32Array(16);
 
-  public get right() {
-    return new Vector3([
-      this.values[0],
-      this.values[4],
-      this.values[8],
-    ]);
-  }
-
-  public get up() {
-    return new Vector3([
-      this.values[1],
-      this.values[5],
-      this.values[9],
-    ]);
-  }
-
-  public get forward() {
-    return new Vector3([
-      this.values[2],
-      this.values[6],
-      this.values[10],
-    ]);
-  }
-
   constructor(values?: number[]);
   constructor(a11: number, a12: number, a13: number, a14: number,
               a21: number, a22: number, a23: number, a24: number,
