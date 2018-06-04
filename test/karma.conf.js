@@ -1,23 +1,13 @@
-/**
- * @licence
- * Copyright (c) 2018 LinBo Len <linbolen@gradii.com>
- * Copyright (c) 2017-2018 Alipay inc.
- *
- * Use of this source code is governed by an MIT-style license.
- * See LICENSE file in the project root for full license information.
- */
-
 const path = require('path');
-const { customLaunchers, platformMap } = require('./browser-providers');
+const {customLaunchers, platformMap} = require('./browser-providers');
 
-module.exports = config => {
+module.exports = (config) => {
 
   config.set({
     basePath: path.join(__dirname, '..'),
-    frameworks: [ 'mocha' ],
+    frameworks: ['jasmine'],
     plugins: [
-      // require('karma-jasmine'),
-      require('karma-mocha'),
+      require('karma-jasmine'),
       require('karma-browserstack-launcher'),
       require('karma-sauce-launcher'),
       require('karma-chrome-launcher'),
@@ -26,35 +16,45 @@ module.exports = config => {
       require('karma-coverage')
     ],
     files: [
-      { pattern: 'node_modules/systemjs/dist/system.src.js', included: true, watched: false },
-      { pattern: 'node_modules/chai/chai.js', included: false, watched: false },
-      { pattern: 'node_modules/lodash/**/*.js', included: false, watched: false },
-      { pattern: 'node_modules/jquery/dist/jquery.js', included: false, watched: false },
-      // { pattern: 'node_modules/gl-matrix/dist/gl-matrix.js', included: false, watched: false },
-      { pattern: 'node_modules/event-simulate/index.js', included: false, watched: false },
-      { pattern: 'node_modules/spm-jquery/jquery.js', included: false, watched: false },
-      // { pattern: 'node_modules/wolfy87-eventemitter/EventEmitter.js', included: false, watched: false },
-      // { pattern: 'node_modules/d3-color/build/*.js', included: false, watched: false },
-      // { pattern: 'node_modules/d3-ease/build/*.js', included: false, watched: false },
-      // { pattern: 'node_modules/d3-interpolate/build/*.js', included: false, watched: false },
-      // { pattern: 'node_modules/d3-timer/build/*.js', included: false, watched: false },
-      { pattern: 'karma/karma-test-shim.js', included: true, watched: false },
-      { pattern: 'src/**/*.js', included: false, watched: true },
-      { pattern: 'test/**/*+(.js|.jpg)', included: false, watched: true }
+      {pattern: 'node_modules/core-js/client/core.js', included: true, watched: false},
+      {pattern: 'node_modules/tslib/tslib.js', included: true, watched: false},
+      {pattern: 'node_modules/systemjs/dist/system.src.js', included: true, watched: false},
+      {pattern: 'node_modules/zone.js/dist/zone.js', included: true, watched: false},
+      {pattern: 'node_modules/zone.js/dist/proxy.js', included: true, watched: false},
+      {pattern: 'node_modules/zone.js/dist/sync-test.js', included: true, watched: false},
+      {pattern: 'node_modules/zone.js/dist/jasmine-patch.js', included: true, watched: false},
+      {pattern: 'node_modules/zone.js/dist/async-test.js', included: true, watched: false},
+      {pattern: 'node_modules/zone.js/dist/fake-async-test.js', included: true, watched: false},
+      {pattern: 'node_modules/hammerjs/hammer.min.js', included: true, watched: false},
+      {pattern: 'node_modules/hammerjs/hammer.min.js.map', included: false, watched: false},
+      {pattern: 'node_modules/moment/min/moment-with-locales.min.js', included: true, watched: false},
+
+      // Include all Angular dependencies
+      {pattern: 'node_modules/@angular/**/*', included: false, watched: false},
+      {pattern: 'node_modules/rxjs/**/*', included: false, watched: false},
+
+      {pattern: 'test/karma-test-shim.js', included: true, watched: false},
+
+      // Include a Material theme in the test suite.
+      {pattern: 'dist/packages/**/core/theming/prebuilt/indigo-pink.css', included: true, watched: true},
+
+      // Includes all package tests and source files into karma. Those files will be watched.
+      // This pattern also matches all all sourcemap files and TypeScript files for debugging.
+      {pattern: 'dist/packages/**/*', included: false, watched: true},
     ],
 
-    customLaunchers,
+    customLaunchers: customLaunchers,
 
     preprocessors: {
-      'dist/**/*.js': [ 'sourcemap' ]
+      'dist/packages/**/*.js': ['sourcemap']
     },
 
-    reporters: [ 'dots' ],
-    autoWatch: true,
+    reporters: ['dots'],
+    autoWatch: false,
 
     coverageReporter: {
-      type: 'json-summary',
-      dir: 'dist/coverage/',
+      type : 'json-summary',
+      dir : 'dist/coverage/',
       subdir: '.'
     },
 
@@ -65,7 +65,7 @@ module.exports = config => {
       recordScreenshots: false,
       idleTimeout: 600,
       commandTimeout: 600,
-      maxDuration: 5400
+      maxDuration: 5400,
     },
 
     browserStack: {
@@ -74,15 +74,15 @@ module.exports = config => {
       retryLimit: 1,
       timeout: 600,
       pollingTimeout: 20000,
-      video: false
+      video: false,
     },
 
     browserDisconnectTimeout: 20000,
     browserNoActivityTimeout: 240000,
     captureTimeout: 120000,
-    browsers: [ 'Chrome' ],
+    browsers: ['ChromeHeadlessLocal'],
 
-    singleRun: true,
+    singleRun: false,
 
     browserConsoleLogOptions: {
       terminal: true,
@@ -97,13 +97,13 @@ module.exports = config => {
     }
   });
 
-  if (process.env[ 'TRAVIS' ]) {
+  if (process.env['TRAVIS']) {
     const buildId = `TRAVIS #${process.env.TRAVIS_BUILD_NUMBER} (${process.env.TRAVIS_BUILD_ID})`;
 
-    if (process.env[ 'TRAVIS_PULL_REQUEST' ] === 'false' &&
-      process.env[ 'MODE' ] === 'travis_required') {
+    if (process.env['TRAVIS_PULL_REQUEST'] === 'false' &&
+        process.env['MODE'] === "travis_required") {
 
-      config.preprocessors[ 'dist/packages/**/!(*+(.|-)spec).js' ] = [ 'coverage' ];
+      config.preprocessors['dist/packages/**/!(*+(.|-)spec).js'] = ['coverage'];
       config.reporters.push('coverage');
     }
 
@@ -111,7 +111,7 @@ module.exports = config => {
     // It will look like <platform>_<target>, where platform is one of 'saucelabs', 'browserstack'
     // or 'travis'. The target is a reference to different collections of browsers that can run
     // in the previously specified platform.
-    const [ platform, target ] = process.env.MODE.split('_');
+    const [platform, target] = process.env.MODE.split('_');
 
     if (platform === 'saucelabs') {
       config.sauceLabs.build = buildId;
@@ -123,6 +123,6 @@ module.exports = config => {
       throw new Error(`Platform "${platform}" unknown, but Travis specified. Exiting.`);
     }
 
-    config.browsers = platformMap[ platform ][ target.toLowerCase() ];
+    config.browsers = platformMap[platform][target.toLowerCase()];
   }
 };
