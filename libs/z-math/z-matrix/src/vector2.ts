@@ -527,14 +527,6 @@ export class Vector2 {
     return out;
   }
 
-  public multiplyMatrix3(matrix: Matrix3, out: Vector2 = null): Vector2 {
-    if (!out) {
-      out = this;
-    }
-
-    return Matrix3.multiplyVector2(matrix, this, out);
-  }
-
   public clone() {
     return this.copy();
   }

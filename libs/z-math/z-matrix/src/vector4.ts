@@ -6,8 +6,6 @@
  * See LICENSE file in the project root for full license information.
  */
 
-import {Matrix4} from './matrix4';
-
 export class Vector4 {
   public static zero = new Vector4([0, 0, 0, 1]);
 
@@ -425,7 +423,7 @@ export class Vector4 {
     return dest;
   }
 
-  public static quotient(vector: Vector4, vector2: Vector4, dest: Vector4 = null): Vector4 {
+  public static quotient(vector: Vector4, vector2: Vector4, dest?: Vector4): Vector4 {
     if (!dest) {
       dest = new Vector4();
     }

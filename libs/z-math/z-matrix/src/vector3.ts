@@ -6,9 +6,6 @@
  * See LICENSE file in the project root for full license information.
  */
 
-import {Matrix3} from './matrix3';
-import {Quaternion} from './quaternion';
-
 export class Vector3 {
   public static zero = new Vector3([0, 0, 0]);
 
@@ -241,47 +238,6 @@ export class Vector3 {
     dest.x *= length;
     dest.y *= length;
     dest.z *= length;
-
-    return dest;
-  }
-
-  public multiplyByMat3(matrix: Matrix3, out: Vector3 = null): Vector3 {
-    if (!out) {
-      this.copy(out);
-    }
-
-    return matrix.transformVector3(out);
-  }
-
-  public multiplyByQuaternion(quat: Quaternion, dest: Vector3 = null): Vector3 {
-    if (!dest) {
-      dest = this;
-    }
-
-    return quat.multiplyVector3(this, dest);
-  }
-
-  public toQuaternion(dest: Quaternion = null): Quaternion {
-    if (!dest) {
-      dest = new Quaternion();
-    }
-
-    let c = new Vector3();
-    let s = new Vector3();
-
-    c.x = Math.cos(this.x * 0.5);
-    s.x = Math.sin(this.x * 0.5);
-
-    c.y = Math.cos(this.y * 0.5);
-    s.y = Math.sin(this.y * 0.5);
-
-    c.z = Math.cos(this.z * 0.5);
-    s.z = Math.sin(this.z * 0.5);
-
-    dest.x = s.x * c.y * c.z - c.x * s.y * s.z;
-    dest.y = c.x * s.y * c.z + s.x * c.y * s.z;
-    dest.z = c.x * c.y * s.z - s.x * s.y * c.z;
-    dest.w = c.x * c.y * c.z + s.x * s.y * s.z;
 
     return dest;
   }
