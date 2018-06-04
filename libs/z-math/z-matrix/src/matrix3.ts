@@ -105,7 +105,11 @@ export class Matrix3 {
 
   public copy(dest: Matrix3 = null): Matrix3 {
     if (!dest) {
-      dest = new Matrix3();
+      return new Matrix3(
+        this.values[0], this.values[1], this.values[2],
+        this.values[3], this.values[4], this.values[5],
+        this.values[6], this.values[7], this.values[8]
+      );
     }
 
     for (let i = 0; i < 9; i++) {
@@ -742,47 +746,6 @@ export class Matrix3 {
     out.values[7] = a.at(9);
     out.values[8] = a.at(10);
     return out;
-  }
-
-  public static multiplyVector2(m: Matrix3, vector: Vector2, result: Vector2 = null): Vector2 {
-    const x = vector.x,
-          y = vector.y;
-
-    if (result) {
-      result.xy = [
-        x * m.at(0) + y * m.at(3) + m.at(6),
-        x * m.at(1) + y * m.at(4) + m.at(7),
-      ];
-
-      return result;
-    } else {
-      return new Vector2([
-        x * m.at(0) + y * m.at(3) + m.at(6),
-        x * m.at(1) + y * m.at(4) + m.at(7),
-      ]);
-    }
-  }
-
-  public static multiplyVector3(m: Matrix3, vector: Vector3, result: Vector3 = null): Vector3 {
-    let x = vector.x,
-        y = vector.y,
-        z = vector.z;
-
-    if (result) {
-      result.xyz = [
-        x * m.at(0) + y * m.at(3) + z * m.at(6),
-        x * m.at(1) + y * m.at(4) + z * m.at(7),
-        x * m.at(2) + y * m.at(5) + z * m.at(8),
-      ];
-
-      return result;
-    } else {
-      return new Vector3([
-        x * m.at(0) + y * m.at(3) + z * m.at(6),
-        x * m.at(1) + y * m.at(4) + z * m.at(7),
-        x * m.at(2) + y * m.at(5) + z * m.at(8),
-      ]);
-    }
   }
 
   public static absolute(m: Matrix3, out?: Matrix3) {

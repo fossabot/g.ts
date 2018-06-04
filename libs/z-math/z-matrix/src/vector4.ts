@@ -194,15 +194,53 @@ export class Vector4 {
 
   public copy(dest: Vector4 = null): Vector4 {
     if (!dest) {
-      dest = new Vector4();
+      return new Vector4(
+        this.values[0], this.values[1], this.values[2], this.values[3]
+      );
     }
 
-    dest.x = this.x;
-    dest.y = this.y;
-    dest.z = this.z;
-    dest.w = this.w;
+    dest.values[0] = this.values[0];
+    dest.values[1] = this.values[1];
+    dest.values[2] = this.values[2];
+    dest.values[3] = this.values[3];
 
     return dest;
+  }
+
+  public setValues(x: number, y: number, z: number, w: number) {
+    this.values[0] = x;
+    this.values[1] = y;
+    this.values[2] = z;
+    this.values[3] = w;
+
+    return this;
+  }
+
+  public setIdentity() {
+    this.values[0] = 0.0;
+    this.values[1] = 0.0;
+    this.values[2] = 0.0;
+    this.values[3] = 1.0;
+
+    return this;
+  }
+
+  public setFrom(other: Vector4) {
+    this.values[0] = other.values[0];
+    this.values[1] = other.values[1];
+    this.values[2] = other.values[2];
+    this.values[3] = other.values[3];
+
+    return this;
+  }
+
+  public splat(arg: number) {
+    this.values[0] = arg;
+    this.values[1] = arg;
+    this.values[2] = arg;
+    this.values[3] = arg;
+
+    return this;
   }
 
   public negate(dest: Vector4 = null): Vector4 {
@@ -309,11 +347,7 @@ export class Vector4 {
     return dest;
   }
 
-  public normalize(dest: Vector4 = null): Vector4 {
-    if (!dest) {
-      dest = this;
-    }
-
+  public normalize(): Vector4 {
     let length = this.length();
 
     if (length === 1) {
@@ -321,30 +355,22 @@ export class Vector4 {
     }
 
     if (length === 0) {
-      dest.x *= 0;
-      dest.y *= 0;
-      dest.z *= 0;
-      dest.w *= 0;
+      this.values[0] *= 0;
+      this.values[1] *= 0;
+      this.values[2] *= 0;
+      this.values[3] *= 0;
 
-      return dest;
+      return this;
     }
 
     length = 1.0 / length;
 
-    dest.x *= length;
-    dest.y *= length;
-    dest.z *= length;
-    dest.w *= length;
+    this.values[0] *= length;
+    this.values[1] *= length;
+    this.values[2] *= length;
+    this.values[3] *= length;
 
-    return dest;
-  }
-
-  public multiplyMat4(matrix: Matrix4, out: Vector4 = null): Vector4 {
-    if (!out) {
-      this.copy(out);
-    }
-
-    return matrix.transform(out);
+    return this;
   }
 
   public static mix(vector: Vector4, vector2: Vector4, time: number, dest: Vector4 = null): Vector4 {

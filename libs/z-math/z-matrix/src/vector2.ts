@@ -13,8 +13,6 @@ import {Vector3} from './vector3';
 import {Vector4} from './vector4';
 
 export class Vector2 {
-  public static zero = new Vector2([0, 0]);
-
   private values = new Float32Array(2);
 
   // region getter setter
@@ -242,7 +240,7 @@ export class Vector2 {
       this.values[1] = arguments[1];
     } else {
       this.values[0] = 0;
-      this.values[1] = 1;
+      this.values[1] = 0;
     }
   }
 
@@ -257,7 +255,9 @@ export class Vector2 {
 
   public copy(out?: Vector2): Vector2 {
     if (!out) {
-      out = new Vector2();
+      return new Vector2(
+        this.values[0], this.values[1]
+      );
     }
 
     out.x = this.x;

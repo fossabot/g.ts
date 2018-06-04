@@ -11,6 +11,9 @@ import {Vector2} from "./vector2";
 
 export class Aabb2 {
 
+  private _min: Vector2;
+  private _max: Vector2;
+
   public get min() {
     return this._min;
   }
@@ -19,8 +22,16 @@ export class Aabb2 {
     return this._max;
   }
 
-  constructor(private _min: Vector2,
-              private _max: Vector2) {
+  constructor(min: Vector2, max: Vector2);
+  constructor();
+  constructor() {
+    if (arguments.length === 2) {
+      this._min = arguments[0];
+      this._max = arguments[1];
+    } else {
+      this._min = new Vector2();
+      this._max = new Vector2();
+    }
   }
 
   public setCenterAndHalfExtents(center: Vector2, halfExtents: Vector2) {
@@ -43,6 +54,14 @@ export class Aabb2 {
       .setFrom(this._max)
       .sub(this._min)
       .scale(0.5);
+  }
+
+  public copy(out?: Aabb2) {
+    if (!out) {
+      out = new Aabb2();
+    }
+    out.copyFrom(this);
+    return out;
   }
 
   public copyFrom(other: Aabb2) {
@@ -95,12 +114,8 @@ export class Aabb2 {
     return this;
   }
 
-  public rotated(m: Matrix3, out: Aabb2) {
-    if (!out) {
-      out = new Aabb2();
-    }
-
-    return out.copyFrom(this)
+  public rotated(m: Matrix3) {
+    return this.clone()
       .rotate(m);
   }
 
@@ -146,6 +161,10 @@ export class Aabb2 {
       (this._min.y <= other.y) &&
       (this._max.x >= other.x) &&
       (this._max.y >= other.y);
+  }
+
+  public clone(): Aabb2 {
+    return this.copy();
   }
 
   public static minMax(min: Vector2, max: Vector2) {

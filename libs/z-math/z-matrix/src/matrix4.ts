@@ -95,7 +95,12 @@ export class Matrix4 {
 
   public copy(dest: Matrix4 = null): Matrix4 {
     if (!dest) {
-      dest = new Matrix4();
+      return new Matrix4(
+        this.values[0], this.values[1], this.values[2], this.values[3],
+        this.values[4], this.values[5], this.values[6], this.values[7],
+        this.values[8], this.values[9], this.values[10], this.values[11],
+        this.values[12], this.values[13], this.values[14], this.values[15]
+      );
     }
 
     for (let i = 0; i < 16; i++) {
@@ -498,46 +503,33 @@ export class Matrix4 {
     return this.clone().multiply(m);
   }
 
-  public multiplyVector3(vector: Vector3): Vector3 {
-    const x = vector.x,
-          y = vector.y,
-          z = vector.z;
+  public transformVector4(v: Vector4) {
+    const x  = v.x,
+          y  = v.y,
+          z  = v.z,
+          w  = v.w;
+    const _x = this.values[0] * x + this.values[1] * y + this.values[2] * z + this.values[3] * w;
+    const _y = this.values[4] * x + this.values[5] * y + this.values[6] * z + this.values[7] * w;
+    const _z = this.values[8] * x + this.values[9] * y + this.values[10] * z + this.values[11] * w;
+    const _w = this.values[12] * x + this.values[13] * y + this.values[14] * z + this.values[15] * w;
 
-    return new Vector3([
-      this.values[0] * x + this.values[4] * y + this.values[8] * z + this.values[12],
-      this.values[1] * x + this.values[5] * y + this.values[9] * z + this.values[13],
-      this.values[2] * x + this.values[6] * y + this.values[10] * z + this.values[14],
-    ]);
+    v.setValues(_x, _y, _z, _w);
+    return v;
   }
 
-  public multiplyVector4(vector: Vector4, dest: Vector4 = null): Vector4 {
-    if (!dest) {
-      dest = new Vector4();
-    }
+  // tslint:disable-next-line
+  public transform = this.transformVector4.bind(this);
 
-    const x = vector.x,
-          y = vector.y,
-          z = vector.z,
-          w = vector.w;
+  public transform3(v: Vector3) {
+    const x  = v.x,
+          y  = v.y,
+          z  = v.z;
+    const _x = this.values[0] * x + this.values[1] * y + this.values[2] * z + this.values[3];
+    const _y = this.values[4] * x + this.values[5] * y + this.values[6] * z + this.values[7];
+    const _z = this.values[8] * x + this.values[9] * y + this.values[10] * z + this.values[11];
 
-    dest.x = this.values[0] * x + this.values[4] * y + this.values[8] * z + this.values[12] * w;
-    dest.y = this.values[1] * x + this.values[5] * y + this.values[9] * z + this.values[13] * w;
-    dest.z = this.values[2] * x + this.values[6] * y + this.values[10] * z + this.values[14] * w;
-    dest.w = this.values[3] * x + this.values[7] * y + this.values[11] * z + this.values[15] * w;
-
-    return dest;
-  }
-
-  public transform() {
-
-  }
-
-  public transform2() {
-
-  }
-
-  public transform3() {
-
+    v.setValues(_x, _y, _z);
+    return v;
   }
 
   public toMatrix3(): Matrix3 {

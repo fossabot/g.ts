@@ -98,7 +98,9 @@ export class Vector3 {
 
   public copy(dest: Vector3 = null): Vector3 {
     if (!dest) {
-      dest = new Vector3();
+      return new Vector3(
+        this.values[0], this.values[1], this.values[2]
+      );
     }
 
     dest.x = this.x;

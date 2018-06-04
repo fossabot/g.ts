@@ -56,9 +56,12 @@ export class Matrix2 {
     }
   }
 
-  public copy(dest: Matrix2 = null): Matrix2 {
+  public copy(dest?: Matrix2): Matrix2 {
     if (!dest) {
-      dest = new Matrix2();
+      return new Matrix2(
+        this.values[0], this.values[1],
+        this.values[2], this.values[3]
+      );
     }
 
     for (let i = 0; i < 4; i++) {
