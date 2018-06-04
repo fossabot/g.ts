@@ -89,9 +89,9 @@ export class Vector3 {
   }
 
   public reset(): void {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
+    this.values[0] = 0;
+    this.values[1] = 0;
+    this.values[2] = 0;
   }
 
   public copy(dest: Vector3 = null): Vector3 {
@@ -101,17 +101,17 @@ export class Vector3 {
       );
     }
 
-    dest.x = this.x;
-    dest.y = this.y;
-    dest.z = this.z;
+    dest.values[0] = this.values[0];
+    dest.values[1] = this.values[1];
+    dest.values[2] = this.values[2];
 
     return dest;
   }
 
   public setFrom(v: Vector3) {
-    this.x = v.x;
-    this.y = v.y;
-    this.z = v.z;
+    this.values[0] = v.values[0];
+    this.values[1] = v.values[1];
+    this.values[2] = v.values[2];
 
     return this;
   }
@@ -127,23 +127,23 @@ export class Vector3 {
       dest = this;
     }
 
-    dest.x = -this.x;
-    dest.y = -this.y;
-    dest.z = -this.z;
+    dest.values[0] = -this.values[0];
+    dest.values[1] = -this.values[1];
+    dest.values[2] = -this.values[2];
 
     return dest;
   }
 
   public equals(vector: Vector3, threshold = EPSILON): boolean {
-    if (Math.abs(this.x - vector.x) > threshold) {
+    if (Math.abs(this.values[0] - vector.values[0]) > threshold) {
       return false;
     }
 
-    if (Math.abs(this.y - vector.y) > threshold) {
+    if (Math.abs(this.values[1] - vector.values[1]) > threshold) {
       return false;
     }
 
-    if (Math.abs(this.z - vector.z) > threshold) {
+    if (Math.abs(this.values[2] - vector.values[2]) > threshold) {
       return false;
     }
 
@@ -155,25 +155,33 @@ export class Vector3 {
   }
 
   public squaredLength(): number {
-    let x = this.x,
-        y = this.y,
-        z = this.z;
+    let x = this.values[0],
+        y = this.values[1],
+        z = this.values[2];
 
     return (x * x + y * y + z * z);
   }
 
   public add(vector: Vector3): Vector3 {
-    this.x += vector.x;
-    this.y += vector.y;
-    this.z += vector.z;
+    this.values[0] += vector.values[0];
+    this.values[1] += vector.values[1];
+    this.values[2] += vector.values[2];
+
+    return this;
+  }
+
+  public addScaled(vector: Vector3, factor: number): Vector3 {
+    this.values[0] += vector.values[0] * factor;
+    this.values[1] += vector.values[1] * factor;
+    this.values[2] += vector.values[2] * factor;
 
     return this;
   }
 
   public subtract(vector: Vector3): Vector3 {
-    this.x -= vector.x;
-    this.y -= vector.y;
-    this.z -= vector.z;
+    this.values[0] -= vector.values[0];
+    this.values[1] -= vector.values[1];
+    this.values[2] -= vector.values[2];
 
     return this;
   }
@@ -182,9 +190,9 @@ export class Vector3 {
   public sub = this.subtract.bind(this);
 
   public multiply(vector: Vector3): Vector3 {
-    this.x *= vector.x;
-    this.y *= vector.y;
-    this.z *= vector.z;
+    this.values[0] *= vector.values[0];
+    this.values[1] *= vector.values[1];
+    this.values[2] *= vector.values[2];
 
     return this;
   }
@@ -193,11 +201,15 @@ export class Vector3 {
   public mul = this.multiply.bind(this);
 
   public divide(vector: Vector3): Vector3 {
-    this.x /= vector.x;
-    this.y /= vector.y;
-    this.z /= vector.z;
+    this.values[0] /= vector.values[0];
+    this.values[1] /= vector.values[1];
+    this.values[2] /= vector.values[2];
 
     return this;
+  }
+
+  public dot(v: Vector3) {
+    return Vector3.dot(this, v);
   }
 
   // tslint:disable-next-line
@@ -208,9 +220,9 @@ export class Vector3 {
       dest = this;
     }
 
-    dest.x *= value;
-    dest.y *= value;
-    dest.z *= value;
+    dest.values[0] *= value;
+    dest.values[1] *= value;
+    dest.values[2] *= value;
 
     return dest;
   }
@@ -227,18 +239,18 @@ export class Vector3 {
     }
 
     if (length === 0) {
-      dest.x = 0;
-      dest.y = 0;
-      dest.z = 0;
+      dest.values[0] = 0;
+      dest.values[1] = 0;
+      dest.values[2] = 0;
 
       return dest;
     }
 
     length = 1.0 / length;
 
-    dest.x *= length;
-    dest.y *= length;
-    dest.z *= length;
+    dest.values[0] *= length;
+    dest.values[1] *= length;
+    dest.values[2] *= length;
 
     return dest;
   }
@@ -252,25 +264,25 @@ export class Vector3 {
       dest = new Vector3();
     }
 
-    const x = vector.x,
-          y = vector.y,
-          z = vector.z;
+    const x = vector.values[0],
+          y = vector.values[1],
+          z = vector.values[2];
 
-    const x2 = vector2.x,
-          y2 = vector2.y,
-          z2 = vector2.z;
+    const x2 = vector2.values[0],
+          y2 = vector2.values[1],
+          z2 = vector2.values[2];
 
-    dest.x = y * z2 - z * y2;
-    dest.y = z * x2 - x * z2;
-    dest.z = x * y2 - y * x2;
+    dest.values[0] = y * z2 - z * y2;
+    dest.values[1] = z * x2 - x * z2;
+    dest.values[2] = x * y2 - y * x2;
 
     return dest;
   }
 
   public static dot(vector: Vector3, vector2: Vector3): number {
-    const x = vector.x,
-          y = vector.y,
-          z = vector.z;
+    const x = vector.values[0],
+          y = vector.values[1],
+          z = vector.values[2];
 
     const x2 = vector2.x,
           y2 = vector2.y,
@@ -280,17 +292,13 @@ export class Vector3 {
   }
 
   public static distance(vector: Vector3, vector2: Vector3): number {
-    const x = vector2.x - vector.x,
-          y = vector2.y - vector.y,
-          z = vector2.z - vector.z;
-
     return Math.sqrt(this.squaredDistance(vector, vector2));
   }
 
   public static squaredDistance(vector: Vector3, vector2: Vector3): number {
-    const x = vector2.x - vector.x,
-          y = vector2.y - vector.y,
-          z = vector2.z - vector.z;
+    const x = vector2.x - vector.values[0],
+          y = vector2.y - vector.values[1],
+          z = vector2.z - vector.values[2];
 
     return (x * x + y * y + z * z);
   }
@@ -300,25 +308,25 @@ export class Vector3 {
       dest = new Vector3();
     }
 
-    const x = vector.x - vector2.x,
-          y = vector.y - vector2.y,
-          z = vector.z - vector2.z;
+    const x = vector.values[0] - vector2.x,
+          y = vector.values[1] - vector2.y,
+          z = vector.values[2] - vector2.z;
 
     let length = Math.sqrt(x * x + y * y + z * z);
 
     if (length === 0) {
-      dest.x = 0;
-      dest.y = 0;
-      dest.z = 0;
+      dest.values[0] = 0;
+      dest.values[1] = 0;
+      dest.values[2] = 0;
 
       return dest;
     }
 
     length = 1 / length;
 
-    dest.x = x * length;
-    dest.y = y * length;
-    dest.z = z * length;
+    dest.values[0] = x * length;
+    dest.values[1] = y * length;
+    dest.values[2] = z * length;
 
     return dest;
   }
@@ -328,9 +336,9 @@ export class Vector3 {
       dest = new Vector3();
     }
 
-    dest.x = vector.x + time * (vector2.x - vector.x);
-    dest.y = vector.y + time * (vector2.y - vector.y);
-    dest.z = vector.z + time * (vector2.z - vector.z);
+    dest.values[0] = vector.values[0] + time * (vector2.x - vector.values[0]);
+    dest.values[1] = vector.values[1] + time * (vector2.y - vector.values[1]);
+    dest.values[2] = vector.values[2] + time * (vector2.z - vector.values[2]);
 
     return dest;
   }
@@ -340,9 +348,9 @@ export class Vector3 {
       dest = new Vector3();
     }
 
-    dest.x = vector.x + vector2.x;
-    dest.y = vector.y + vector2.y;
-    dest.z = vector.z + vector2.z;
+    dest.values[0] = vector.values[0] + vector2.x;
+    dest.values[1] = vector.values[1] + vector2.y;
+    dest.values[2] = vector.values[2] + vector2.z;
 
     return dest;
   }
@@ -352,9 +360,9 @@ export class Vector3 {
       dest = new Vector3();
     }
 
-    dest.x = vector.x - vector2.x;
-    dest.y = vector.y - vector2.y;
-    dest.z = vector.z - vector2.z;
+    dest.values[0] = vector.values[0] - vector2.x;
+    dest.values[1] = vector.values[1] - vector2.y;
+    dest.values[2] = vector.values[2] - vector2.z;
 
     return dest;
   }
@@ -364,9 +372,9 @@ export class Vector3 {
       dest = new Vector3();
     }
 
-    dest.x = vector.x * vector2.x;
-    dest.y = vector.y * vector2.y;
-    dest.z = vector.z * vector2.z;
+    dest.values[0] = vector.values[0] * vector2.x;
+    dest.values[1] = vector.values[1] * vector2.y;
+    dest.values[2] = vector.values[2] * vector2.z;
 
     return dest;
   }
@@ -376,9 +384,9 @@ export class Vector3 {
       dest = new Vector3();
     }
 
-    dest.x = vector.x / vector2.x;
-    dest.y = vector.y / vector2.y;
-    dest.z = vector.z / vector2.z;
+    dest.values[0] = vector.values[0] / vector2.x;
+    dest.values[1] = vector.values[1] / vector2.y;
+    dest.values[2] = vector.values[2] / vector2.z;
 
     return dest;
   }
