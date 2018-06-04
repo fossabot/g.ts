@@ -9,7 +9,7 @@
 
 import {now, Timer} from './timer';
 
-export default function(callback, delay, time) {
+export function zInterval(callback, delay, time) {
   let t = new Timer, total = delay;
   if (delay == null) { return t.restart(callback, delay, time), t; }
   delay = +delay, time = time == null ? now() : +time;

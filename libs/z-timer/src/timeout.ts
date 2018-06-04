@@ -9,10 +9,10 @@
 
 import {Timer} from './timer';
 
-export default function(callback, delay, time) {
+export function zTimeout(callback, delay, time) {
   let t = new Timer;
   delay = delay == null ? 0 : +delay;
-  t.restart(function(elapsed) {
+  t.restart((elapsed) => {
     t.stop();
     callback(elapsed + delay);
   }, delay, time);

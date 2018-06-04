@@ -8,7 +8,8 @@
  */
 
 import {Color} from './color';
-import {deg2rad, rad2deg} from './math';
+import {deg2rad} from './common';
+import {Hcl} from "./hcl";
 import {Rgb} from './rgb';
 
 // https://beta.observablehq.com/@mbostock/lab-and-rgb
@@ -30,6 +31,29 @@ export class Lab extends Color {
     super();
   }
 
+  public brighter(k) {
+    return new Lab(this.l + K * (k == null ? 1 : k), this.a, this.b, this.opacity);
+  }
+
+  public darker(k) {
+    return new Lab(this.l - K * (k == null ? 1 : k), this.a, this.b, this.opacity);
+  }
+
+  public rgb(): Rgb {
+    let y = (this.l + 16) / 116,
+        x = isNaN(this.a) ? y : y + this.a / 500,
+        z = isNaN(this.b) ? y : y - this.b / 200;
+    x     = Xn * lab2xyz(x);
+    y     = Yn * lab2xyz(y);
+    z     = Zn * lab2xyz(z);
+    return new Rgb(
+      lrgb2rgb(3.1338561 * x - 1.6168667 * y - 0.4906146 * z),
+      lrgb2rgb(-0.9787684 * x + 1.9161415 * y + 0.0334540 * z),
+      lrgb2rgb(0.0719453 * x - 0.2289914 * y + 1.4052427 * z),
+      this.opacity
+    );
+  }
+
   public static create(o) {
     if (o instanceof Lab) { return new Lab(o.l, o.a, o.b, o.opacity); }
     if (o instanceof Hcl) {
@@ -48,29 +72,6 @@ export class Lab extends Color {
     }
     return new Lab(116 * y - 16, 500 * (x - y), 200 * (y - z), o.opacity);
   }
-
-  public brighter(k) {
-    return new Lab(this.l + K * (k == null ? 1 : k), this.a, this.b, this.opacity);
-  }
-
-  public darker(k) {
-    return new Lab(this.l - K * (k == null ? 1 : k), this.a, this.b, this.opacity);
-  }
-
-  public rgb() {
-    let y = (this.l + 16) / 116,
-        x = isNaN(this.a) ? y : y + this.a / 500,
-        z = isNaN(this.b) ? y : y - this.b / 200;
-    x     = Xn * lab2xyz(x);
-    y     = Yn * lab2xyz(y);
-    z     = Zn * lab2xyz(z);
-    return new Rgb(
-      lrgb2rgb(3.1338561 * x - 1.6168667 * y - 0.4906146 * z),
-      lrgb2rgb(-0.9787684 * x + 1.9161415 * y + 0.0334540 * z),
-      lrgb2rgb(0.0719453 * x - 0.2289914 * y + 1.4052427 * z),
-      this.opacity,
-    );
-  }
 }
 
 function xyz2lab(t) {
@@ -87,31 +88,4 @@ function lrgb2rgb(x) {
 
 function rgb2lrgb(x) {
   return (x /= 255) <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
-}
-
-export class Hcl extends Color {
-
-  constructor(public h, public c, public l, public opacity) {
-    super();
-  }
-
-  public static create(o) {
-    if (o instanceof Hcl) { return new Hcl(o.h, o.c, o.l, o.opacity); }
-    if (!(o instanceof Lab)) { o = Lab.create(o); }
-    if (o.a === 0 && o.b === 0) { return new Hcl(NaN, 0, o.l, o.opacity); }
-    let h = Math.atan2(o.b, o.a) * rad2deg;
-    return new Hcl(h < 0 ? h + 360 : h, Math.sqrt(o.a * o.a + o.b * o.b), o.l, o.opacity);
-  }
-
-  public brighter(k) {
-    return new Hcl(this.h, this.c, this.l + K * (k == null ? 1 : k), this.opacity);
-  }
-
-  public darker(k) {
-    return new Hcl(this.h, this.c, this.l - K * (k == null ? 1 : k), this.opacity);
-  }
-
-  public rgb() {
-    return Lab.create(this).rgb();
-  }
 }

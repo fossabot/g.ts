@@ -8,8 +8,8 @@
  */
 
 import {Color} from './color';
+import {deg2rad, rad2deg} from './common';
 import {brighter, darker} from './const';
-import {deg2rad, rad2deg} from './math';
 import {Rgb} from './rgb';
 
 const A     = -0.14861,
